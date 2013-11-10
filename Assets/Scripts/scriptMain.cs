@@ -41,11 +41,11 @@ public class scriptMain : MonoBehaviour {
 	
 	void ShowScreen(int iScreenId) {
 		if(iScreenId == 2) {
-			iTween.MoveTo(gameObject, new Vector3(102.4f, 0.0f, -10.0f), 1.0f);
+			iTween.MoveTo(gameObject, new Vector3(-102.4f, 0.0f, 0.0f), 1.0f);
 		} else if(iScreenId == 1){
-			iTween.MoveTo(gameObject, new Vector3(51.2f, 0.0f, -10.0f), 1.0f);
+			iTween.MoveTo(gameObject, new Vector3(-51.2f, 0.0f, 0.0f), 1.0f);
 		} else { //Asume 0
-			iTween.MoveTo(gameObject, new Vector3(0.0f, 0.0f, -10.0f), 1.0f);
+			iTween.MoveTo(gameObject, new Vector3(0.0f, 0.0f, 0.0f), 1.0f);
 		}
 	}
 	
