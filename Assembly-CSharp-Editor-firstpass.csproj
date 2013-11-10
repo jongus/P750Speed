@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{6A825938-9F04-30EF-84AC-5C539BA650DB}</ProjectGuid>
+	<ProjectGuid>{D2F8EED5-692B-FC3A-F231-0CC9BE3E3D63}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -18,7 +18,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_IPHONE;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_TERRAIN;ENABLE_SUBSTANCE;ENABLE_GENERICS;ENABLE_WWW;ENABLE_IMAGEEFFECTS;UNITY_IPHONE_API;ENABLE_WEBCAM;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_GAMECENTER;UNITY_IOS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_2_1;UNITY_4_2;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_OSX;ENABLE_DUCK_TYPING</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_IPHONE;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_TERRAIN;ENABLE_SUBSTANCE;ENABLE_GENERICS;ENABLE_WWW;ENABLE_IMAGEEFFECTS;UNITY_IPHONE_API;ENABLE_WEBCAM;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_GAMECENTER;UNITY_IOS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_2_2;UNITY_4_2;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_OSX;ENABLE_DUCK_TYPING</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -65,6 +65,7 @@
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Editor Window.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitSolidVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Function Call From Menu.js.txt" />
+     <None Include="Assets\Fonts\Smallnumbers.fnt" />
      <None Include="Assets\TK2DROOT\tk2d\Goodies\TexturePacker\Exporter\2dtoolkit\exporter.xml" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\SolidVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Scriptable Wizard.cs.txt" />
@@ -72,6 +73,7 @@
      <None Include="Assets\TK2DROOT\tk2dUI\Shaders\DepthMask.shader" />
      <None Include="Assets\Plugins\FingerGestures\Readme.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.boo.txt" />
+     <None Include="Assets\iTween\ReadMe!\ReadMe!.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitPremulVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\MonoBehaviour.functions.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.cs.txt" />
@@ -84,9 +86,12 @@
      <None Include="Assets\TK2DROOT\tk2dUI\Shaders\DepthMaskSolid.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\AssetPostprocessor.functions.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.js.txt" />
+     <None Include="Assets\Fonts\Bignumbers_decimals.fnt" />
+     <None Include="Assets\Fonts\Smallnumbers_decimals.fnt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\BlendVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.boo.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitCutoutVertexColor.shader" />
+     <None Include="Assets\Fonts\Bignumbers.fnt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\EditorWindow.functions.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Editor\EditorUtility.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\ScriptableWizard.functions.txt" />
@@ -128,7 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{0FA7081D-98D7-0E74-D303-E86FF1CA14B8}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+      <Project>{C93045C2-B026-F95B-25B4-34DD5D117CC4}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

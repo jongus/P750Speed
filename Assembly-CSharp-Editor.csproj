@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{5BE57ED6-AB26-EA04-3E35-A23DEEC368A7}</ProjectGuid>
+	<ProjectGuid>{91DE12E2-DFFA-4BE9-D4D7-68A489401F79}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -147,7 +147,9 @@
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Scriptable Wizard.cs.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Scriptable Object.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2dUI\Shaders\DepthMask.shader" />
+     <None Include="Assets\Plugins\FingerGestures\Readme.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.boo.txt" />
+     <None Include="Assets\iTween\ReadMe!\ReadMe!.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitPremulVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\MonoBehaviour.functions.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.cs.txt" />
@@ -206,8 +208,12 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{C93045C2-B026-F95B-25B4-34DD5D117CC4}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{684F308A-1E80-B9F8-70B2-2FDBBC8653AE}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
+      <Project>{9C8CAF22-3F7A-ED70-3ECB-5A120D3721CC}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-CSharp-Editor-firstpass.csproj">
+      <Project>{D2F8EED5-692B-FC3A-F231-0CC9BE3E3D63}</Project>      <Name>Assembly-CSharp-Editor-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

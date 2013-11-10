@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{684F308A-1E80-B9F8-70B2-2FDBBC8653AE}</ProjectGuid>
+	<ProjectGuid>{9C8CAF22-3F7A-ED70-3ECB-5A120D3721CC}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -109,6 +109,10 @@
      <Compile Include="Assets\TK2DROOT\tk2dUI\Code\Core\tk2dUISpriteAnimator.cs" />
      <Compile Include="Assets\TK2DROOT\tk2dUI\Code\Core\tk2dUITime.cs" />
      <Compile Include="Assets\TK2DROOT\tk2dUI\Code\Core\tk2dUITouch.cs" />
+     <Compile Include="Assets\iTween\Plugins\iTween.cs" />
+     <Compile Include="Assets\iTween\Sample\MoveSample.cs" />
+     <Compile Include="Assets\iTween\Sample\RotateSample.cs" />
+     <Compile Include="Assets\iTween\Sample\SampleInfo.cs" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\MonoBehaviour.cs.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Editor Window.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitSolidVertexColor.shader" />
@@ -119,7 +123,9 @@
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Scriptable Wizard.cs.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Scriptable Object.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2dUI\Shaders\DepthMask.shader" />
+     <None Include="Assets\Plugins\FingerGestures\Readme.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.boo.txt" />
+     <None Include="Assets\iTween\ReadMe!\ReadMe!.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitPremulVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\MonoBehaviour.functions.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.cs.txt" />
@@ -158,6 +164,10 @@
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Function Call From Menu.boo.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Editor Window.js.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\AdditiveVertexColor.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{C93045C2-B026-F95B-25B4-34DD5D117CC4}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
