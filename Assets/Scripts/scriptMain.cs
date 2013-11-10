@@ -6,6 +6,7 @@ public class scriptMain : MonoBehaviour {
 	
 	private int i;
 	private int iCurrentScreen = 0;
+	private tk2dSprite spritePaginationMarked;
 	
 	// Start is called just before any of the
 	// Update methods is called the first time.
@@ -17,6 +18,7 @@ public class scriptMain : MonoBehaviour {
 		Screen.autorotateToLandscapeRight = true;
 		Screen.orientation = ScreenOrientation.AutoRotation;
 		//Grab objects
+		spritePaginationMarked = GameObject.Find ("spritePaginationMarked").GetComponent<tk2dSprite>();
 
 	}
 	
@@ -42,10 +44,13 @@ public class scriptMain : MonoBehaviour {
 	void ShowScreen(int iScreenId) {
 		if(iScreenId == 2) {
 			iTween.MoveTo(gameObject, new Vector3(-102.4f, 0.0f, 0.0f), 1.0f);
+			spritePaginationMarked.transform.position = new Vector3(1.0f, -17.8f, -1.0f);
 		} else if(iScreenId == 1){
 			iTween.MoveTo(gameObject, new Vector3(-51.2f, 0.0f, 0.0f), 1.0f);
+			spritePaginationMarked.transform.position = new Vector3(0.0f, -17.8f, -1.0f);
 		} else { //Asume 0
 			iTween.MoveTo(gameObject, new Vector3(0.0f, 0.0f, 0.0f), 1.0f);
+			spritePaginationMarked.transform.position = new Vector3(-1.0f, -17.8f, -1.0f);
 		}
 	}
 	
