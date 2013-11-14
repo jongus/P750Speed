@@ -2,14 +2,19 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class scriptStartUp : MonoBehaviour {
+public class ScriptStartUp : MonoBehaviour {
 	private int i;
 	// Start is called just before any of the
 	// Update methods is called the first time.
 	void Start () {
-		Screen.orientation = ScreenOrientation.LandscapeLeft; 
-		
+		if(PlayerPrefs.GetInt ("Screen.orientation",1) == 0) {
+			Screen.orientation = ScreenOrientation.LandscapeLeft;	
+		} else {
+			Screen.orientation = ScreenOrientation.LandscapeRight;
+		}
+		 
 	}
+	
 	void Update () {
 		if(i >= 7) {
 			//Wait faor a while..
