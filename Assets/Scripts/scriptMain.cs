@@ -13,12 +13,12 @@ public class ScriptMain : MonoBehaviour {
 	private ScreenOrientation orientationOld = ScreenOrientation.LandscapeLeft;
 	private int iWaitForGPS = 0; //The first updates tend to be wrong...
 	private double dLastTimestamp = 0.0d; //Updates when we move
-	private double dLastLat = 0;
-	private double dLastLon = 0;
+	private double dLastLat = 0.0d;
+	private double dLastLon = 0.0d;
 	private double[] adAvgSpeed;	
 	private double dBearing = 0.0d;
-	private double dCurSpeed = 0.0;
-	private double dAccDist = 0.0;
+	private double dCurSpeed = -1.0d;
+	private double dAccDist = 0.0d;
 	
 	//Text Meshes
 	private tk2dTextMesh tmCurrentSpeed;
@@ -85,12 +85,13 @@ public class ScriptMain : MonoBehaviour {
 			if(Input.location.lastData.timestamp != dLastTimestamp ) {
 				//New data from gps!
 				CalculateMovement();
-				
+				UpdateSpeed(dCurSpeed);
 			} else if((dNowInEpoch() - Input.location.lastData.timestamp) > 3.0d) {
 				//We are not moving?? Handle speed in a nice way, not a real error!
-			
+				UpdateSpeed(-1.0d);
 			}
 		}
+		
 		
 		
 		
@@ -108,6 +109,22 @@ public class ScriptMain : MonoBehaviour {
 			ShowScreen (iCurrentScreen);
 		}
 	}
+	
+	private void UpdateSpeed(double dSpeed) { 
+		if(dSpeed >= 0.0d) {
+			double dIntegerPart = Math.Floor(Math.Round (dSpeed, 1));
+			double dDecimalPart = Math.Round (dSpeed, 1) - dIntegerPart;
+			tmCurrentSpeed.text = dIntegerPart.ToString ("#0");
+			tmCurrentSpeedDecimal.text = dDecimalPart.ToString("0.0").Remove (0,1);	
+		} else {
+			tmCurrentSpeed.text = "--";
+			tmCurrentSpeedDecimal.text = ".-";
+		}
+		
+		tmCurrentSpeed.Commit ();
+		tmCurrentSpeedDecimal.Commit ();
+	}
+	
 	
 	private void CalculateMovement() {
         LocationInfo liTmp = Input.location.lastData;
