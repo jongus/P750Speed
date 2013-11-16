@@ -9,6 +9,7 @@ public class ScriptMain : MonoBehaviour {
 	
 	//General variables
 	private int iCurrentScreen = 0;
+	private int iLocationStatus = -1; //-1=startup, 0=ok, 1=something wrong
 	private tk2dSprite spritePaginationMarked;
 	private ScreenOrientation orientationOld = ScreenOrientation.LandscapeLeft;
 	private int iWaitForGPS = 0; //The first updates tend to be wrong...
@@ -21,9 +22,10 @@ public class ScriptMain : MonoBehaviour {
 	private double dAccDist = 0.0d;
 	
 	//Text Meshes
+	private tk2dTextMesh tmDebug; //BUG
 	private tk2dTextMesh tmCurrentSpeed;
 	private tk2dTextMesh tmCurrentSpeedDecimal;
-	private int iLocationStatus = -1; //-1=startup, 0=ok, 1=something wrong
+	private tk2dTextMesh tmHeading;
 	
 	//GameObjects
 	private GameObject goWarning;
@@ -39,12 +41,15 @@ public class ScriptMain : MonoBehaviour {
 		Screen.orientation = ScreenOrientation.AutoRotation;
 		
 		//Grab objects
+		tmDebug = GameObject.Find ("tmDebug").GetComponent<tk2dTextMesh>(); //BUG
 		spritePaginationMarked = GameObject.Find ("spritePaginationMarked").GetComponent<tk2dSprite>();
 		tmCurrentSpeed = GameObject.Find ("tmCurrentSpeed").GetComponent<tk2dTextMesh>();
 		tmCurrentSpeedDecimal = GameObject.Find ("tmCurrentSpeedDecimal").GetComponent<tk2dTextMesh>();
+		tmHeading = GameObject.Find ("tmHeading").GetComponent<tk2dTextMesh>();
 		goWarning = GameObject.Find ("/goWarning");
 		
 		//And start GPS
+		adAvgSpeed = new double[3];
 		dLastTimestamp = dNowInEpoch();
 		Input.location.Start (1.0f, 0.1f);
 	}
@@ -86,15 +91,16 @@ public class ScriptMain : MonoBehaviour {
 				//New data from gps!
 				CalculateMovement();
 				UpdateSpeed(dCurSpeed);
+				UpdateHeading(dBearing);
+				tmDebug.text =  "dCurSpeed: " + dCurSpeed.ToString("#0.0"); //BUG
 			} else if((dNowInEpoch() - Input.location.lastData.timestamp) > 3.0d) {
 				//We are not moving?? Handle speed in a nice way, not a real error!
 				UpdateSpeed(-1.0d);
+				UpdateHeading(-1.0d);
 			}
+			 
 		}
-		
-		
-		
-		
+		tmDebug.Commit (); //BUG
 	}
 	
 	void OnSwipe(SwipeGesture gesture) {
@@ -120,10 +126,19 @@ public class ScriptMain : MonoBehaviour {
 			tmCurrentSpeed.text = "--";
 			tmCurrentSpeedDecimal.text = ".-";
 		}
-		
 		tmCurrentSpeed.Commit ();
 		tmCurrentSpeedDecimal.Commit ();
 	}
+	
+	private void UpdateHeading(double dHeading) { 
+		if(dHeading >= 0.0d) {
+			tmHeading.text = Math.Round (dBearing, 0).ToString ("#0") + "°";
+		} else {
+			tmHeading.text = "---";
+		}
+		tmHeading.Commit ();
+	}
+	
 	
 	
 	private void CalculateMovement() {
