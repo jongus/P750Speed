@@ -87,16 +87,16 @@ public class ScriptMain : MonoBehaviour {
 		
 		//Okey, we got some kind of position
 		if(iLocationStatus == 0) {
+			UpdateHeading(Input.compass.trueHeading);
 			if(Input.location.lastData.timestamp != dLastTimestamp ) {
 				//New data from gps!
 				CalculateMovement();
 				UpdateSpeed(dCurSpeed);
-				UpdateHeading(dBearing);
 				tmDebug.text =  "dCurSpeed: " + dCurSpeed.ToString("#0.0"); //BUG
 			} else if((dNowInEpoch() - Input.location.lastData.timestamp) > 3.0d) {
 				//We are not moving?? Handle speed in a nice way, not a real error!
 				UpdateSpeed(-1.0d);
-				UpdateHeading(-1.0d);
+				//UpdateHeading(-1.0d);
 			}
 			 
 		}
@@ -115,6 +115,11 @@ public class ScriptMain : MonoBehaviour {
 			ShowScreen (iCurrentScreen);
 		}
 	}
+	
+	void OnApplicationPause(bool pauseStatus) {
+        //pauseStatus = true -> applicationDidEnterBackground();
+		//pauseStatus = false -> applicationDidBecomeActive();
+    }
 	
 	private void UpdateSpeed(double dSpeed) { 
 		if(dSpeed >= 0.0d) {
