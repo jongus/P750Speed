@@ -9,8 +9,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import <CoreGraphics/CoreGraphics.h>
 
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES1/glext.h>
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
 
 static DisplayManager* _DisplayManager = nil;
 
@@ -90,6 +90,13 @@ extern "C" void InitEAGLLayer(void* eaglLayer, bool use32bitColor);
 	return self;
 }
 
+- (void)shouldShowWindow:(BOOL)show
+{
+	window.hidden = show ? NO : YES;
+	window.screen = show ? screen : nil;
+}
+
+
 - (void)createContext:(EAGLContext*)parent
 {
 	if(surface.context == nil)
@@ -99,19 +106,7 @@ extern "C" void InitEAGLLayer(void* eaglLayer, bool use32bitColor);
 	}
 }
 
-- (void)recreateSurface:(BOOL)use32bitColor
-{
-	[self recreateSurface:use32bitColor use24bitDepth:NO];
-}
-- (void)recreateSurface:(BOOL)use32bitColor use24bitDepth:(BOOL)use24bitDepth
-{
-	[self recreateSurface:use32bitColor use24bitDepth:use24bitDepth msaaSampleCount:0];
-}
-- (void)recreateSurface:(BOOL)use32bitColor use24bitDepth:(BOOL)use24bitDepth msaaSampleCount:(int)msaaSampleCount
-{
-	[self recreateSurface:use32bitColor use24bitDepth:use24bitDepth msaaSampleCount:msaaSampleCount renderW:-1 renderH:-1];
-}
-- (void)recreateSurface:(BOOL)use32bitColor use24bitDepth:(BOOL)use24bitDepth msaaSampleCount:(int)msaaSampleCount renderW:(int)renderW renderH:(int)renderH
+- (void)recreateSurface:(RenderingSurfaceParams)params
 {
 	[self createContext:[[DisplayManager Instance] mainDisplay]->surface.context];
 
@@ -119,36 +114,39 @@ extern "C" void InitEAGLLayer(void* eaglLayer, bool use32bitColor);
 	screenSize.width  = roundf(screenSize.width) * screen.scale;
 	screenSize.height = roundf(screenSize.height) * screen.scale;
 
-	bool systemSizeChanged  = screenSize.width != surface.systemW || screenSize.height != surface.systemH;
-	bool msaaChanged        = (surface.msaaSamples != msaaSampleCount && _supportsMSAA);
-	bool colorfmtChanged    = use32bitColor != surface.use32bitColor;
-	bool depthfmtChanged    = surface.use24bitDepth != use24bitDepth;
+	bool systemSizeChanged	= screenSize.width != surface.systemW || screenSize.height != surface.systemH;
+	bool msaaChanged		= (surface.msaaSamples != params.msaaSampleCount && _supportsMSAA);
+	bool colorfmtChanged	= params.use32bitColor != surface.use32bitColor;
+	bool depthfmtChanged	= params.use24bitDepth != surface.use24bitDepth;
+	bool useCVCacheChanged	= params.useCVTextureCache != surface.useCVTextureCache;
 
 	bool renderSizeChanged  = false;
-	if(     (renderW > 0 && surface.targetW != renderW)             // changed resolution
-		||  (renderH > 0 && surface.targetH != renderH)             // changed resolution
-		||  (renderW <= 0 && surface.targetW != surface.systemW)    // no longer need intermediate fb
-		||  (renderH <= 0 && surface.targetH != surface.systemH)    // no longer need intermediate fb
+	if(		(params.renderW > 0 && surface.targetW != params.renderW)	// changed resolution
+		||	(params.renderH > 0 && surface.targetH != params.renderH)	// changed resolution
+		||	(params.renderW <= 0 && surface.targetW != surface.systemW)	// no longer need intermediate fb
+		||	(params.renderH <= 0 && surface.targetH != surface.systemH)	// no longer need intermediate fb
 	  )
 	{
 		renderSizeChanged = true;
 	}
 
-	bool recreateSystemSurface      = (surface.systemFB == 0) || systemSizeChanged || colorfmtChanged;
-	bool recreateRenderingSurface   = systemSizeChanged || renderSizeChanged || msaaChanged || colorfmtChanged;
-	bool recreateDepthbuffer        = systemSizeChanged || renderSizeChanged || msaaChanged || depthfmtChanged;
+	bool recreateSystemSurface		= (surface.systemFB == 0) || systemSizeChanged || colorfmtChanged;
+	bool recreateRenderingSurface	= systemSizeChanged || renderSizeChanged || msaaChanged || colorfmtChanged || useCVCacheChanged;
+	bool recreateDepthbuffer		= systemSizeChanged || renderSizeChanged || msaaChanged || depthfmtChanged;
 
 
-	surface.use32bitColor = use32bitColor;
-	surface.use24bitDepth = use24bitDepth;
+	surface.use32bitColor		= params.use32bitColor;
+	surface.use24bitDepth		= params.use24bitDepth;
+	surface.useCVTextureCache	= params.useCVTextureCache;
 
 	surface.systemW = screenSize.width;
 	surface.systemH = screenSize.height;
 
-	surface.targetW = renderW > 0 ? renderW : surface.systemW;
-	surface.targetH = renderH > 0 ? renderH : surface.systemH;
+	surface.targetW = params.renderW > 0 ? params.renderW : surface.systemW;
+	surface.targetH = params.renderH > 0 ? params.renderH : surface.systemH;
 
-	surface.msaaSamples = _supportsMSAA ? msaaSampleCount : 0;
+	surface.msaaSamples = _supportsMSAA ? params.msaaSampleCount : 0;
+
 
 	if(recreateSystemSurface)
 		CreateSystemRenderingSurface(&surface);
@@ -192,14 +190,17 @@ extern "C" void InitEAGLLayer(void* eaglLayer, bool use32bitColor);
 		PreparePresentRenderingSurface(&surface, [[DisplayManager Instance] mainDisplay]->surface.context);
 
 		EAGLContextSetCurrentAutoRestore autorestore(surface.context);
-		GLES_CHK(glBindRenderbufferOES(GL_RENDERBUFFER_OES, surface.systemColorRB));
-		[surface.context presentRenderbuffer:GL_RENDERBUFFER_OES];
+		GLES_CHK(glBindRenderbuffer(GL_RENDERBUFFER, surface.systemColorRB));
+		[surface.context presentRenderbuffer:GL_RENDERBUFFER];
 
 		if(needRecreateSurface)
 		{
-			[self   recreateSurface:surface.use32bitColor use24bitDepth:surface.use24bitDepth msaaSampleCount:surface.msaaSamples
-					renderW:(int)requestedRenderingSize.width renderH:(int)requestedRenderingSize.height
-			];
+			RenderingSurfaceParams params =
+			{
+				surface.msaaSamples, (int)requestedRenderingSize.width, (int)requestedRenderingSize.height,
+				surface.use32bitColor, surface.use24bitDepth, surface.cvTextureCache != 0
+			};
+			[self recreateSurface:params];
 
 			needRecreateSurface = NO;
 			requestedRenderingSize = CGSizeMake(surface.targetW, surface.targetH);
@@ -280,7 +281,6 @@ extern "C" void InitEAGLLayer(void* eaglLayer, bool use32bitColor);
 
 - (void)updateDisplayListInUnity
 {
-	extern void UnityUpdateDisplayList();
 	UnityUpdateDisplayList();
 }
 
@@ -316,10 +316,7 @@ extern "C" void InitEAGLLayer(void* eaglLayer, bool use32bitColor);
 	{
 		DisplayConnection* conn = [[DisplayManager Instance] display:screen];
 		if(conn->surface.systemFB != 0)
-		{
-			extern void UnityDisableRenderBuffers(void*, void*);
 			UnityDisableRenderBuffers(conn->surface.unityColorBuffer, conn->surface.unityDepthBuffer);
-		}
 	}
 
 	NSValue* key = [NSValue valueWithPointer:screen];
@@ -366,10 +363,8 @@ static void EnsureDisplayIsInited(DisplayConnection* conn)
 	// careful here: we dont want to trigger surface recreation
 	if(conn->surface.systemFB == 0)
 	{
-		extern bool UnityUse32bitDisplayBuffer();
-		extern bool UnityUse24bitDepthBuffer();
-		[conn recreateSurface:UnityUse32bitDisplayBuffer() use24bitDepth:UnityUse24bitDepthBuffer()];
-
+		RenderingSurfaceParams params = {0, -1, -1, UnityUse32bitDisplayBuffer(), UnityUse24bitDepthBuffer(), false};
+		[conn recreateSurface:params];
 		{
 			// make sure we end up with correct context/fbo setup
 			DisplayConnection* main = [[DisplayManager Instance] mainDisplay];
@@ -379,17 +374,17 @@ static void EnsureDisplayIsInited(DisplayConnection* conn)
 	}
 }
 
-int UnityDisplayManager_DisplayCount()
+extern "C" int UnityDisplayManager_DisplayCount()
 {
 	return [[DisplayManager Instance] displayCount];
 }
 
-bool UnityDisplayManager_DisplayAvailable(void* nativeDisplay)
+extern "C" bool UnityDisplayManager_DisplayAvailable(void* nativeDisplay)
 {
 	return [[DisplayManager Instance] displayAvailable:(UIScreen*)nativeDisplay];
 }
 
-void UnityDisplayManager_DisplaySystemResolution(void* nativeDisplay, int* w, int* h)
+extern "C" void UnityDisplayManager_DisplaySystemResolution(void* nativeDisplay, int* w, int* h)
 {
 	DisplayConnection* conn = [[DisplayManager Instance] display:(UIScreen*)nativeDisplay];
 	EnsureDisplayIsInited(conn);
@@ -398,7 +393,7 @@ void UnityDisplayManager_DisplaySystemResolution(void* nativeDisplay, int* w, in
 	*h = (int)conn->surface.systemH;
 }
 
-void UnityDisplayManager_DisplayRenderingResolution(void* nativeDisplay, int* w, int* h)
+extern "C" void UnityDisplayManager_DisplayRenderingResolution(void* nativeDisplay, int* w, int* h)
 {
 	DisplayConnection* conn = [[DisplayManager Instance] display:(UIScreen*)nativeDisplay];
 	EnsureDisplayIsInited(conn);
@@ -407,7 +402,7 @@ void UnityDisplayManager_DisplayRenderingResolution(void* nativeDisplay, int* w,
 	*h = (int)conn->surface.targetH;
 }
 
-void UnityDisplayManager_DisplayRenderingBuffers(void* nativeDisplay, void** colorBuffer, void** depthBuffer)
+extern "C" void UnityDisplayManager_DisplayRenderingBuffers(void* nativeDisplay, void** colorBuffer, void** depthBuffer)
 {
 	DisplayConnection* conn = [[DisplayManager Instance] display:(UIScreen*)nativeDisplay];
 	EnsureDisplayIsInited(conn);
@@ -416,25 +411,20 @@ void UnityDisplayManager_DisplayRenderingBuffers(void* nativeDisplay, void** col
 	if(depthBuffer) *depthBuffer = conn->surface.unityDepthBuffer;
 }
 
-void UnityDisplayManager_SetRenderingResolution(void* nativeDisplay, int w, int h)
+extern "C" void UnityDisplayManager_SetRenderingResolution(void* nativeDisplay, int w, int h)
 {
 	DisplayConnection* conn = [[DisplayManager Instance] display:(UIScreen*)nativeDisplay];
 	EnsureDisplayIsInited(conn);
 
 	if((UIScreen*)nativeDisplay == [UIScreen mainScreen])
-	{
-		extern void UnityRequestRenderingResolution(unsigned, unsigned);
 		UnityRequestRenderingResolution(w,h);
-	}
 	else
-	{
 		[conn requestRenderingResolution:CGSizeMake(w,h)];
-	}
 }
 
-extern "C" const UnityRenderingSurface* UnityDisplayManager_MainDisplayRenderingSurface()
+extern "C" void UnityDisplayManager_ShouldShowWindowOnDisplay(void* nativeDisplay, bool show)
 {
-	return &[[DisplayManager Instance] mainDisplay]->surface;
+	DisplayConnection* conn = [[DisplayManager Instance] display:(UIScreen*)nativeDisplay];
+	if(conn != [DisplayManager Instance].mainDisplay)
+		[conn shouldShowWindow:show];
 }
-
-

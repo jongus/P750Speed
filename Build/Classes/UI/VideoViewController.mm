@@ -3,8 +3,6 @@
 #include "UnityViewControllerBase.h"
 #include "iPhone_OrientationSupport.h"
 
-void UnityPause(bool pause);
-
 @implementation UnityVideoViewController
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation

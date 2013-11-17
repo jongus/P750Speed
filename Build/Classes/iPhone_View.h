@@ -2,7 +2,7 @@
 #define _TRAMPOLINE_IPHONE_VIEW_H_
 
 #import <UIKit/UIKit.h>
-#include "iPhone_Common.h"
+
 #include "Unity/GlesHelper.h"
 #include "UI/UnityViewControllerBase.h"
 
@@ -25,6 +25,6 @@ void    CheckOrientationRequest();
 void    OrientTo(int requestedOrient);
 
 float   ScreenScaleFactor();
-void    SetScreenFactorFromScreen(UIView* view);
+void    SetScaleFactorFromScreen(UIView* view);
 
 #endif // _TRAMPOLINE_IPHONE_VIEW_H_

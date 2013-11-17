@@ -1,7 +1,4 @@
 
-#include "iPhone_Common.h"
-
-
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
@@ -22,10 +19,28 @@ static NSString*	_ADID				= nil;
 static bool			_AdTrackingEnabled	= false;
 static NSString*	_VendorID			= nil;
 
+static NSString*	_DeviceName			= nil;
+static NSString*	_SystemName			= nil;
+static NSString*	_SystemVersion		= nil;
+
+static NSString*	_DeviceModel		= nil;
+static int			_DeviceGeneration	= deviceUnknown;
+static float		_DeviceDPI			= -1.0f;
+
+
 static void QueryDeviceID();
 static void QueryAdID();
 static void QueryAdTracking();
 static void QueryVendorID();
+
+static void QueryDeviceName();
+static void QuerySystemName();
+static void QuerySystemVersion();
+
+static void QueryDeviceModel();
+static void QueryDeviceGeneration();
+static void EstimateDeviceDPI();
+
 
 //
 // unity interface
@@ -50,6 +65,36 @@ extern "C" bool 		UnityAdvertisingTrackingEnabled()
 {
 	QueryAdTracking();
 	return _AdTrackingEnabled;
+}
+extern "C" const char*	UnityDeviceName()
+{
+	QueryDeviceName();
+	return [_DeviceName UTF8String];
+}
+extern "C" const char*	UnitySystemName()
+{
+	QuerySystemName();
+	return [_SystemName UTF8String];
+}
+extern "C" const char*	UnitySystemVersion()
+{
+	QuerySystemVersion();
+	return [_SystemVersion UTF8String];
+}
+extern "C" const char*	UnityDeviceModel()
+{
+	QueryDeviceModel();
+	return [_DeviceModel UTF8String];
+}
+extern "C" int			UnityDeviceGeneration()
+{
+	QueryDeviceGeneration();
+	return _DeviceGeneration;
+}
+extern "C" float		UnityDeviceDPI()
+{
+	EstimateDeviceDPI();
+	return _DeviceDPI;
 }
 
 
@@ -120,10 +165,185 @@ static void QueryAdTracking()
 
 static void QueryVendorID()
 {
-	if(_VendorID == nil)
+	if(_VendorID == nil && [UIDevice instancesRespondToSelector:@selector(identifierForVendor)])
+		_VendorID = (NSString*)[[[[UIDevice currentDevice] performSelector:@selector(identifierForVendor)] UUIDString] retain];
+}
+
+static NSString* QueryDeviceStringProperty(SEL prop)
+{
+	return [UIDevice instancesRespondToSelector:prop] ? [[[UIDevice currentDevice] performSelector:prop] retain] : nil;
+}
+
+
+static void QueryDeviceName()
+{
+	if(_DeviceName == nil)
+		_DeviceName = QueryDeviceStringProperty(@selector(name));
+}
+static void QuerySystemName()
+{
+	if(_SystemName == nil)
+		_SystemName = QueryDeviceStringProperty(@selector(systemName));
+}
+static void QuerySystemVersion()
+{
+	if(_SystemVersion == nil)
+		_SystemVersion = QueryDeviceStringProperty(@selector(systemVersion));
+}
+
+static void QueryDeviceModel()
+{
+	if(_DeviceModel == nil)
 	{
-		if([UIDevice instancesRespondToSelector:@selector(identifierForVendor)])
-			_VendorID = (NSString*)[[[[UIDevice currentDevice] performSelector:@selector(identifierForVendor)] UUIDString] retain];
+		size_t size;
+		::sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+
+		char* model = (char*)::malloc(size + 1);
+		::sysctlbyname("hw.machine", model, &size, NULL, 0);
+		model[size] = 0;
+
+		_DeviceModel = [[NSString stringWithUTF8String:model] retain];
+		::free(model);
+	}
+}
+
+static void QueryDeviceGeneration()
+{
+	if(_DeviceGeneration == deviceUnknown)
+	{
+		const char* model = UnityDeviceModel();
+
+		if (!strcmp(model, "iPhone2,1"))
+			_DeviceGeneration = deviceiPhone3GS;
+		else if (!strncmp(model, "iPhone3,",8))
+			_DeviceGeneration = deviceiPhone4;
+		else if (!strncmp(model, "iPhone4,",8))
+			_DeviceGeneration = deviceiPhone4S;
+		else if (!strncmp(model, "iPhone6,",8))
+			_DeviceGeneration = deviceiPhone5S;
+		else if (!strcmp(model, "iPod1,1"))
+			_DeviceGeneration = deviceiPodTouch1Gen;
+		else if (!strcmp(model, "iPod2,1"))
+			_DeviceGeneration = deviceiPodTouch2Gen;
+		else if (!strcmp(model, "iPod3,1"))
+			_DeviceGeneration = deviceiPodTouch3Gen;
+		else if (!strcmp(model, "iPod4,1"))
+			_DeviceGeneration = deviceiPodTouch4Gen;
+		else if (!strncmp(model, "iPod5,",6))
+			_DeviceGeneration = deviceiPodTouch5Gen;
+		else if (!strcmp(model, "iPad1,1"))
+			_DeviceGeneration = deviceiPad1Gen;
+
+		// check iphone5c, ipad2 and ipad3 separately - they are special cases as apple reused major ver for different hws
+		if(_DeviceGeneration == deviceUnknown)
+		{
+			if (!strncmp(model, "iPhone5,",8))
+			{
+				int rev = atoi(model+8);
+				if (rev >= 3) _DeviceGeneration = deviceiPhone5C; // iPhone5,3
+				else		  _DeviceGeneration = deviceiPhone5;
+			}
+			else if (!strncmp(model, "iPad2,", 6))
+			{
+				int rev = atoi(model+6);
+				if(rev >= 5)	_DeviceGeneration = deviceiPadMini1Gen; // iPad2,5
+				else			_DeviceGeneration = deviceiPad2Gen;
+			}
+			else if (!strncmp(model, "iPad3,", 6))
+			{
+				int rev = atoi(model+6);
+				if(rev >= 4)	_DeviceGeneration = deviceiPad4Gen; // iPad3,4
+				else			_DeviceGeneration = deviceiPad3Gen;
+			}
+		}
+
+		// completely unknown hw - just determine form-factor
+		if(_DeviceGeneration == deviceUnknown)
+		{
+			if (!strncmp(model, "iPhone",6))
+				_DeviceGeneration = deviceiPhoneUnknown;
+			else if (!strncmp(model, "iPad",4))
+				_DeviceGeneration = deviceiPadUnknown;
+			else if (!strncmp(model, "iPod",4))
+				_DeviceGeneration = deviceiPodTouchUnknown;
+
+			_DeviceGeneration = deviceUnknown;
+		}
+	}
+}
+
+static void EstimateDeviceDPI()
+{
+	if(_DeviceDPI < 0.0f)
+	{
+		float baseDPI 		= 160.0f; // phone-like devices
+		float scaleFactor 	= 1.0f;
+
+		const char* model = UnityDeviceModel();
+		if(::strncmp(model, "iPad", 4) == 0)
+		{
+			if(UnityDeviceGeneration() == deviceiPadMini1Gen)	baseDPI = 167.0f;
+			else												baseDPI = 130.0f;
+		}
+
+		if( [UIScreen instancesRespondToSelector:@selector(scale)] )
+			scaleFactor = (float)[[UIScreen mainScreen] scale];
+
+		_DeviceDPI = baseDPI * scaleFactor;
+	}
+}
+
+
+//
+// some higher-level helpers
+//
+
+extern "C" void QueryTargetResolution(int* targetW, int* targetH)
+{
+	enum
+	{
+		kTargetResolutionNative = 0,
+		kTargetResolutionAutoPerformance = 3,
+		kTargetResolutionAutoQuality = 4,
+		kTargetResolution320p = 5,
+		kTargetResolution640p = 6,
+		kTargetResolution768p = 7
+	};
+
+
+	int targetRes = UnityGetTargetResolution();
+
+	float resMult = 1.0f;
+	if(targetRes == kTargetResolutionAutoPerformance)
+	{
+		switch(UnityDeviceGeneration())
+		{
+			case deviceiPhone4:		resMult = 0.6f;		break;
+			case deviceiPad1Gen:	resMult = 0.5f;		break;
+			default:				resMult = 0.75f;	break;
+		}
+	}
+
+	if(targetRes == kTargetResolutionAutoQuality)
+	{
+		switch(UnityDeviceGeneration())
+		{
+			case deviceiPhone4:		resMult = 0.8f;		break;
+			case deviceiPad1Gen:	resMult = 0.75f;	break;
+			default:				resMult = 1.0f;		break;
+		}
+	}
+
+	switch(targetRes)
+	{
+		case kTargetResolution320p:	*targetW = 320;	*targetH = 480;		break;
+		case kTargetResolution640p:	*targetW = 640;	*targetH = 960;		break;
+		case kTargetResolution768p:	*targetW = 768;	*targetH = 1024;	break;
+
+		default:
+			*targetW = GetMainDisplay()->screenSize.width * resMult;
+			*targetH = GetMainDisplay()->screenSize.height * resMult;
+			break;
 	}
 }
 

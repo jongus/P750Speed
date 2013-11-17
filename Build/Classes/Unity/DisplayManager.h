@@ -1,11 +1,24 @@
 #ifndef _TRAMPOLINE_UNITY_DISPLAYMANAGER_H_
 #define _TRAMPOLINE_UNITY_DISPLAYMANAGER_H_
 
-#include "iPhone_Common.h"
 #include "GlesHelper.h"
 
 @class EAGLContext;
 @class UnityView;
+
+typedef struct
+RenderingSurfaceParams
+{
+	int  msaaSampleCount;
+	int  renderW;
+	int  renderH;
+
+	bool use32bitColor;
+	bool use24bitDepth;
+	bool useCVTextureCache;
+}
+RenderingSurfaceParams;
+
 
 @interface DisplayConnection : NSObject
 {
@@ -22,13 +35,12 @@
 - (id)createView:(BOOL)useWithGles showRightAway:(BOOL)showRightAway;
 - (id)createView:(BOOL)useWithGles;
 
+- (void)shouldShowWindow:(BOOL)show;
+
 - (void)dealloc;
 
 - (void)createContext:(EAGLContext*)parent;
-- (void)recreateSurface:(BOOL)use32bitColor use24bitDepth:(BOOL)use24bitDepth msaaSampleCount:(int)msaaSampleCount renderW:(int)renderW renderH:(int)renderH;
-- (void)recreateSurface:(BOOL)use32bitColor use24bitDepth:(BOOL)use24bitDepth msaaSampleCount:(int)msaaSampleCount;
-- (void)recreateSurface:(BOOL)use32bitColor use24bitDepth:(BOOL)use24bitDepth;
-- (void)recreateSurface:(BOOL)use32bitColor;
+- (void)recreateSurface:(RenderingSurfaceParams)params;
 
 - (void)requestRenderingResolution:(CGSize)res;
 
@@ -55,9 +67,13 @@
 + (DisplayManager*)Instance;
 @end
 
-inline DisplayConnection* GetMainDisplay()
+inline DisplayConnection* 		GetMainDisplay()
 {
 	return [[DisplayManager Instance] mainDisplay];
+}
+inline UnityRenderingSurface*	GetMainRenderingSurface()
+{
+	return &GetMainDisplay()->surface;
 }
 
 #endif // _TRAMPOLINE_UNITY_DISPLAYMANAGER_H_

@@ -3,33 +3,20 @@
 
 #ifdef __IPHONE_5_0
 
-#include "iPhone_Common.h"
 #include "GlesHelper.h"
+#include "DisplayManager.h"
 
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #include <CoreVideo/CVOpenGLESTextureCache.h>
 
-extern "C" const UnityRenderingSurface* UnityDisplayManager_MainDisplayRenderingSurface();
+const CFStringRef kCVPixelBufferOpenGLESCompatibilityKey = CFSTR("OpenGLESCompatibility");
+
 
 
 bool CanUseCVTextureCache()
 {
-	static bool _CanUseCVTextureCache = true;
-	static bool _CanUseInited = false;
-
-	if(!_CanUseInited)
-	{
-		if(!_ios50orNewer)
-			_CanUseCVTextureCache = false;
-
-		if(!IsRunningWithGLES2())
-			_CanUseCVTextureCache = false;
-
-		_CanUseInited = true;
-	}
-
-	return _CanUseCVTextureCache;
+	return _ios50orNewer;
 }
 
 void* CreateCVTextureCache()
@@ -37,7 +24,7 @@ void* CreateCVTextureCache()
 	if(!CanUseCVTextureCache())
 		return 0;
 
-	EAGLContext* context = UnityDisplayManager_MainDisplayRenderingSurface()->context;
+	EAGLContext* context = GetMainRenderingSurface()->context;
 
 	CVOpenGLESTextureCacheRef cache = 0;
 	CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, 0, context, 0, &cache);
@@ -87,7 +74,7 @@ void* CreateTextureFromCVTextureCache(void* cache_, void* image_, unsigned w, un
 	return texture;
 }
 
-unsigned GetGLTextureFromTextureCache(void* texture_)
+unsigned GetGLTextureFromCVTextureCache(void* texture_)
 {
 	if(!CanUseCVTextureCache())
 		return 0;
@@ -99,12 +86,55 @@ unsigned GetGLTextureFromTextureCache(void* texture_)
 	return CVOpenGLESTextureGetName(texture);
 }
 
+void* CreatePixelBufferForCVTextureCache(unsigned w, unsigned h)
+{
+	CVPixelBufferRef pb = 0;
+
+#if __has_feature(objc_dictionary_literals)
+	NSDictionary* options = @{	(NSString*)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
+								(NSString*)kCVPixelBufferWidthKey : @(w),
+								(NSString*)kCVPixelBufferHeightKey : @(h),
+								(NSString*)kCVPixelBufferOpenGLESCompatibilityKey : @YES,
+								(NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{}
+							};
+#else
+	NSArray* keys = [NSArray arrayWithObjects:
+		(NSString*)kCVPixelBufferPixelFormatTypeKey,
+		(NSString*)kCVPixelBufferWidthKey,
+		(NSString*)kCVPixelBufferHeightKey,
+		(NSString*)kCVPixelBufferOpenGLESCompatibilityKey,
+		(NSString*)kCVPixelBufferIOSurfacePropertiesKey,
+		nil
+	];
+	NSArray* values = [NSArray arrayWithObjects:
+		[NSNumber numberWithInt:kCVPixelFormatType_32BGRA],
+		[NSNumber numberWithInt:w],
+		[NSNumber numberWithInt:h],
+		[NSNumber numberWithInt:YES],
+		[NSDictionary dictionary],
+		nil
+	];
+	NSDictionary* options = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+#endif
+
+	CVPixelBufferCreate(kCFAllocatorDefault, w, h, kCVPixelFormatType_32BGRA, (CFDictionaryRef)options, &pb);
+	return pb;
+}
+
+void* CreateReadableRTFromCVTextureCache(void* cache, unsigned w, unsigned h, void** pb)
+{
+	*pb = CreatePixelBufferForCVTextureCache(w, h);
+	return CreateTextureFromCVTextureCache(cache, *pb, w, h, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_BYTE);
+}
+
 #else
 
 bool		CanUseCVTextureCache()																{ return false; }
-void*       CreateCVTextureCache()																{ return 0; }
+void*		CreateCVTextureCache()																{ return 0; }
 void		FlushCVTextureCache(void*)															{}
-void*       CreateTextureFromCVTextureCache(void*, void*, unsigned, unsigned, int, int, int)	{ return 0; }
-unsigned    GetGLTextureFromTextureCache(void*)													{ return 0; }
+void*		CreateTextureFromCVTextureCache(void*, void*, unsigned, unsigned, int, int, int)	{ return 0; }
+unsigned	GetGLTextureFromCVTextureCache(void*)												{ return 0; }
+void*		CreatePixelBufferForTextureCache(unsigned, unsigned)								{ return 0; }
+void* 		CreateReadableRTFromCVTextureCache(void*, unsigned, unsigned, void**)				{ return 0;}
 
 #endif // __IPHONE_5_0

@@ -1,8 +1,6 @@
 
 #include "UnityViewControllerBase.h"
-#include "iPhone_Common.h"
 #include "iPhone_OrientationSupport.h"
-#include "Unity/UnityInterface.h"
 #include "UI/UnityView.h"
 
 #include "objc/runtime.h"
@@ -11,49 +9,48 @@
 BOOL
 ShouldAutorotateToInterfaceOrientation_DefaultImpl(id self_, SEL _cmd, UIInterfaceOrientation interfaceOrientation)
 {
-    EnabledOrientation targetAutorot = kAutorotateToPortrait;
-    ScreenOrientation  targetRot = ConvertToUnityScreenOrientation(interfaceOrientation, &targetAutorot);
-    ScreenOrientation  requestedOrientation = UnityRequestedScreenOrientation();
+	EnabledOrientation targetAutorot = autorotPortrait;
+	ScreenOrientation  targetRot = ConvertToUnityScreenOrientation(interfaceOrientation, &targetAutorot);
+	ScreenOrientation  requestedOrientation = (ScreenOrientation)UnityRequestedScreenOrientation();
 
-    if(requestedOrientation == autorotation)
-        return UnityIsOrientationEnabled(targetAutorot);
-    else
-        return targetRot == requestedOrientation;
+	if(requestedOrientation == autorotation)
+		return UnityIsOrientationEnabled(targetAutorot);
+	else
+		return targetRot == requestedOrientation;
 }
 
 NSUInteger
 SupportedInterfaceOrientations_DefaultImpl(id self_, SEL _cmd)
 {
-    NSUInteger ret = 0;
+	NSUInteger ret = 0;
 
-    if(UnityRequestedScreenOrientation() == autorotation)
-    {
-        if( UnityIsOrientationEnabled(kAutorotateToPortrait) )              ret |= (1 << UIInterfaceOrientationPortrait);
-        if( UnityIsOrientationEnabled(kAutorotateToPortraitUpsideDown) )    ret |= (1 << UIInterfaceOrientationPortraitUpsideDown);
-        if( UnityIsOrientationEnabled(kAutorotateToLandscapeLeft) )         ret |= (1 << UIInterfaceOrientationLandscapeRight);
-        if( UnityIsOrientationEnabled(kAutorotateToLandscapeRight) )        ret |= (1 << UIInterfaceOrientationLandscapeLeft);
-    }
-    else
-    {
-        switch(UnityRequestedScreenOrientation())
-        {
-            case portrait:              ret = (1 << UIInterfaceOrientationPortrait);            break;
-            case portraitUpsideDown:    ret = (1 << UIInterfaceOrientationPortraitUpsideDown);  break;
-            case landscapeLeft:         ret = (1 << UIInterfaceOrientationLandscapeRight);      break;
-            case landscapeRight:        ret = (1 << UIInterfaceOrientationLandscapeLeft);       break;
-            default:                    ret = (1 << UIInterfaceOrientationPortrait);            break;
-        }
-    }
+	if(UnityRequestedScreenOrientation() == autorotation)
+	{
+		if( UnityIsOrientationEnabled(autorotPortrait) )			ret |= (1 << UIInterfaceOrientationPortrait);
+		if( UnityIsOrientationEnabled(autorotPortraitUpsideDown) )	ret |= (1 << UIInterfaceOrientationPortraitUpsideDown);
+		if( UnityIsOrientationEnabled(autorotLandscapeLeft) )		ret |= (1 << UIInterfaceOrientationLandscapeRight);
+		if( UnityIsOrientationEnabled(autorotLandscapeRight) )		ret |= (1 << UIInterfaceOrientationLandscapeLeft);
+	}
+	else
+	{
+		switch(UnityRequestedScreenOrientation())
+		{
+			case portrait:				ret = (1 << UIInterfaceOrientationPortrait);            break;
+			case portraitUpsideDown:	ret = (1 << UIInterfaceOrientationPortraitUpsideDown);  break;
+			case landscapeLeft:			ret = (1 << UIInterfaceOrientationLandscapeRight);      break;
+			case landscapeRight:		ret = (1 << UIInterfaceOrientationLandscapeLeft);       break;
+			default:					ret = (1 << UIInterfaceOrientationPortrait);            break;
+		}
+	}
 
-    return ret;
+	return ret;
 }
 
 BOOL
 ShouldAutorotate_DefaultImpl(id self_, SEL _cmd)
 {
-    return (UnityRequestedScreenOrientation() == autorotation);
+	return (UnityRequestedScreenOrientation() == autorotation);
 }
-
 
 BOOL
 PrefersStatusBarHidden_DefaultImpl(id self_, SEL _cmd)
@@ -149,9 +146,6 @@ AddViewControllerAllDefaultImpl(Class targetClass)
 }
 
 
-extern "C" __attribute__((visibility ("default"))) NSString * const kUnityViewWillRotate = @"kUnityViewWillRotate";
-extern "C" __attribute__((visibility ("default"))) NSString * const kUnityViewDidRotate  = @"kUnityViewDidRotate";
-
 @implementation UnityViewControllerBase
 - (void)assignUnityView:(UnityView*)view_
 {
@@ -175,6 +169,5 @@ extern "C" __attribute__((visibility ("default"))) NSString * const kUnityViewDi
 
 	[UIView setAnimationsEnabled:YES];
 }
-
 @end
 

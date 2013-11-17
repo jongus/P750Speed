@@ -152,7 +152,7 @@ public class ScriptMain : MonoBehaviour {
 		if(iWaitForGPS  >= 4) {
 			//Not the first run
 			//Start by calulating the bearing
-			dBearing = CalculateBearingTo(dLastLon, dLastLat, (double)liTmp.longitude , (double)liTmp.latitude );
+			//dBearing = CalculateBearingTo(dLastLon, dLastLat, (double)liTmp.longitude , (double)liTmp.latitude );
 			
 			//Okey, try to calculate speed
 			double dDist = CalculateDistanceBetweenGPSCoordinates (dLastLon, dLastLat, (double)liTmp.longitude , (double)liTmp.latitude );

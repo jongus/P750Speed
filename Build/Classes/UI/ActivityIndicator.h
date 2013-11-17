@@ -2,7 +2,6 @@
 #define _TRAMPOLINE_UI_ACTIVITYINDICATOR_H_
 
 #import <UIKit/UIKit.h>
-#include "iPhone_Common.h"
 
 
 @interface ActivityIndicator : UIActivityIndicatorView {}

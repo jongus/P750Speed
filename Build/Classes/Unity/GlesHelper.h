@@ -2,10 +2,8 @@
 #ifndef _TRAMPOLINE_UNITY_GLESSUPPORT_H_
 #define _TRAMPOLINE_UNITY_GLESSUPPORT_H_
 
-#import <QuartzCore/QuartzCore.h>
-
-#include <OpenGLES/ES1/gl.h>
-#include "iPhone_Common.h"
+#include <QuartzCore/QuartzCore.h>
+#include <OpenGLES/ES2/gl.h>
 
 
 #define ENABLE_UNITY_GLES_DEBUG 1
@@ -23,6 +21,11 @@ UnityRenderingSurface
 {
 	CAEAGLLayer*	layer;
 	EAGLContext*	context;
+
+    void*   		cvTextureCache;			// CVOpenGLESTextureCacheRef
+    void*   		cvTextureCacheTexture;	// CVOpenGLESTextureRef
+    void*			cvPixelBuffer;			// CVPixelBufferRef
+
 
 	// unity RenderBuffer connection
 	void*			unityColorBuffer;
@@ -56,6 +59,7 @@ UnityRenderingSurface
 	bool 			use32bitColor;
 	bool 			use24bitDepth;
 	bool			allowScreenshot;
+	bool			useCVTextureCache;
 }
 UnityRenderingSurface;
 
@@ -78,9 +82,6 @@ void DestroyUnityRenderBuffers(UnityRenderingSurface* surface);
 void DestroyRenderingSurface(UnityRenderingSurface* surface);
 void PreparePresentRenderingSurface(UnityRenderingSurface* surface, EAGLContext* mainContext);
 void SetupUnityDefaultFBO(UnityRenderingSurface* surface);
-
-// TODO: enum?
-bool IsRunningWithGLES2();
 
 @interface GLView : UIView {}
 @end

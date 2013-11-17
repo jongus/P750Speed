@@ -1,16 +1,10 @@
 
 #include "UnityView.h"
 #include "iPhone_View.h"
+#include "UnityAppController.h"
 #include "iPhone_OrientationSupport.h"
-#include "Unity/UnityInterface.h"
 #include "Unity/GlesHelper.h"
 #include "Unity/DisplayManager.h"
-
-extern void UnitySendTouchesBegin(NSSet* touches, UIEvent* event);
-extern void UnitySendTouchesEnded(NSSet* touches, UIEvent* event);
-extern void UnitySendTouchesCancelled(NSSet* touches, UIEvent* event);
-extern void UnitySendTouchesMoved(NSSet* touches, UIEvent* event);
-
 
 @implementation UnityView
 {
@@ -42,6 +36,7 @@ extern void UnitySendTouchesMoved(NSSet* touches, UIEvent* event);
 - (void)willRotateTo:(ScreenOrientation)orientation
 {
 	_curOrientation = orientation;
+	AppController_RenderPluginMethodWithArg(@selector(onOrientationChange:), (id)_curOrientation);
 	UnitySetScreenOrientation(_curOrientation);
 
 	// please see comments in iPhone_View.mm about this function
@@ -91,10 +86,16 @@ extern void UnitySendTouchesMoved(NSSet* touches, UIEvent* event);
 		unsigned requestedW, requestedH;
 		UnityGetRenderingResolution(&requestedW, &requestedH);
 
-		[GetMainDisplay()	recreateSurface:UnityUse32bitDisplayBuffer() use24bitDepth:UnityUse24bitDepthBuffer()
-							msaaSampleCount:UnityGetDesiredMSAASampleCount(MSAA_DEFAULT_SAMPLE_COUNT)
-							renderW:requestedW renderH:requestedH
-		];
+		RenderingSurfaceParams params =
+		{
+			UnityGetDesiredMSAASampleCount(MSAA_DEFAULT_SAMPLE_COUNT),
+			requestedW, requestedH,
+			UnityUse32bitDisplayBuffer(), UnityUse24bitDepthBuffer(), false
+		};
+
+		AppController_RenderPluginMethodWithArg(@selector(onBeforeMainDisplaySurfaceRecreate:), (id)&params);
+		[GetMainDisplay() recreateSurface:params];
+		AppController_RenderPluginMethod(@selector(onAfterMainDisplaySurfaceRecreate));
 
 		if(_unityLevelReady)
 		{

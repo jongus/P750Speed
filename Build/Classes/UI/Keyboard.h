@@ -4,7 +4,6 @@
 #import <UIKit/UIKit.h>
 
 typedef struct
-KeyboardShowParam
 {
 	const char* text;
 	const char* placeholder;

@@ -69,9 +69,8 @@ static void* _ObservePlayerItemContext = (void*)0x2;
 - (CMTime)duration          { return _duration; }
 - (float)durationSeconds    { return CMTIME_IS_VALID(_duration) ? (float)CMTimeGetSeconds(_duration) : 0.0f; }
 
-// npot textures are supported on gles1 only with ext.
-// so we support only gles2 for the sake of sanity
-+ (BOOL)CanPlayToTexture:(NSURL*)url    { return IsRunningWithGLES2() && [url isFileURL]; }
+
++ (BOOL)CanPlayToTexture:(NSURL*)url    { return [url isFileURL]; }
 
 
 - (void)reportError:(NSError*)error category:(const char*)category
@@ -365,10 +364,10 @@ static void* _ObservePlayerItemContext = (void*)0x2;
                     context:_ObservePlayerItemContext
         ];
 
-        if([AVPlayer instancesRespondToSelector:@selector(allowsExternalPlayback)])
-            [_player setAllowsExternalPlayback: NO];
-        else if ([AVPlayer instancesRespondToSelector:@selector(allowsAirPlayVideo)])
-            [_player setAllowsAirPlayVideo: NO];
+        if([AVPlayer instancesRespondToSelector:@selector(setAllowsExternalPlayback:)])
+            [_player performSelector:@selector(setAllowsExternalPlayback:) withObject:(id)NO];
+        else if ([AVPlayer instancesRespondToSelector:@selector(setAllowsAirPlayVideo:)])
+        	[_player performSelector:@selector(setAllowsAirPlayVideo:) withObject:(id)NO];
     }
 
     if(_player.currentItem == _playerItem)

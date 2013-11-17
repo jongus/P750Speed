@@ -6,11 +6,21 @@ bool		CanUseCVTextureCache();
 void*		CreateCVTextureCache();
 // cache = CVOpenGLESTextureCacheRef
 void		FlushCVTextureCache(void* cache);
+
 // returns CVOpenGLESTextureRef
 // cache = CVOpenGLESTextureCacheRef
-// image = CVImageBufferRef
-void*		CreateTextureFromCVTextureCache(void* cache, void* image, unsigned w, unsigned h, int format, int internalFormat, int type);
+// image = CVImageBufferRef/CVPixelBufferRef
+void*		CreateTextureFromCVTextureCache(void* cache, void* image, unsigned w, unsigned h, int iosFormat, int glesFormat, int type);
 // texture = CVOpenGLESTextureRef
-unsigned	GetGLTextureFromTextureCache(void* texture);
+unsigned	GetGLTextureFromCVTextureCache(void* texture);
+
+// returns CVPixelBufferRef
+// enforces kCVPixelFormatType_32BGRA
+void*		CreatePixelBufferForCVTextureCache(unsigned w, unsigned h);
+// returns CVOpenGLESTextureRef
+// cache = CVOpenGLESTextureCacheRef
+// pb = CVPixelBufferRef (out)
+// enforces rgba texture with bgra backing
+void*		CreateReadableRTFromCVTextureCache(void* cache, unsigned w, unsigned h, void** pb);
 
 #endif // _TRAMPOLINE_UNITY_CVTEXTURECACHE_H_

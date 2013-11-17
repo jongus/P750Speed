@@ -7,15 +7,14 @@
 // we need at least one __TEXT, __const section entry in main application .o files
 // to get this section emitted at right time and so avoid LC_ENCRYPTION_INFO size miscalculation
 static const int constsection = 0;
-bool UnityParseCommandLine(int argc, char *argv[]);
-void UnityInitTrampoline();
 
+void UnityInitTrampoline();
 
 // WARNING: this MUST be c decl (NSString ctor will be called after +load, so we cant really change its value)
 const char* AppControllerClassName = "UnityAppController";
 
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	NSAutoreleasePool* pool = [NSAutoreleasePool new];
 

@@ -29,7 +29,7 @@ void ShowActivityIndicator(UIView* parent, int style)
     if(style >= 0)
     {
         _activityIndicator = [[ActivityIndicator alloc] initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyle)style];
-        SetScreenFactorFromScreen(_activityIndicator);
+        SetScaleFactorFromScreen(_activityIndicator);
     }
 
     if(_activityIndicator != nil)
@@ -42,7 +42,6 @@ void ShowActivityIndicator(UIView* parent, int style)
 
 void ShowActivityIndicator(UIView* parent)
 {
-    extern int UnityGetShowActivityIndicatorOnLoading();
     ShowActivityIndicator(parent, UnityGetShowActivityIndicatorOnLoading());
 }
 

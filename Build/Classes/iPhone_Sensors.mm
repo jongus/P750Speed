@@ -32,8 +32,6 @@ static ControllerPausedHandler gControllerHandler = ^(GCController *controller)
 bool IsCompensatingSensors() { return gCompensateSensors; }
 void SetCompensatingSensors(bool val) { gCompensateSensors = val;}
 
-void UnityDidAccelerate(float x, float y, float z, NSTimeInterval timestamp);
-
 struct Vector3f
 {
 	float x, y, z;
@@ -143,14 +141,9 @@ inline Quaternion4f UnityReorientQuaternion(float x, float y, float z, float w)
 	}
 }
 
-void SetGyroRotationRate(int idx, float x, float y, float z);
-void SetGyroRotationRateUnbiased(int idx, float x, float y, float z);
-void SetGravity(int idx, float x, float y, float z);
-void SetUserAcceleration(int idx, float x, float y, float z);
-void SetAttitude(int idx, float x, float y, float z, float w);
 
-static CMMotionManager *sMotionManager = nil;
-static NSOperationQueue* sMotionQueue = nil;
+static CMMotionManager*		sMotionManager	= nil;
+static NSOperationQueue*	sMotionQueue	= nil;
 
 // Current update interval or 0.0f if not initialized. This is returned
 // to the user as current update interval and this value is set to 0.0f when
@@ -162,6 +155,7 @@ static float sUpdateInterval = 0.0f;
 // so users can set update interval, disable gyroscope, enable gyroscope and
 // after that gyroscope will be updated at this previously set interval.
 static float sUserUpdateInterval = 1.0f / 30.0f;
+
 
 void SensorsCleanup()
 {
@@ -181,86 +175,76 @@ void SensorsCleanup()
 	}
 }
 
-
-void StartGyroAndMotionUpdates()
+extern "C" void UnityCoreMotionStart()
 {
-	if (sMotionManager.gyroAvailable && gEnableGyroscope)
+	if(sMotionQueue == nil)
+		sMotionQueue = [[NSOperationQueue alloc] init];
+
+	bool initMotionManager = (sMotionManager == nil);
+	if(initMotionManager)
+		sMotionManager = [[CMMotionManager alloc] init];
+
+	if(gEnableGyroscope && sMotionManager.gyroAvailable)
 	{
 		[sMotionManager startGyroUpdates];
 		[sMotionManager setGyroUpdateInterval: sUpdateInterval];
 	}
 
-	if (sMotionManager.deviceMotionAvailable && gEnableGyroscope)
+	if(gEnableGyroscope && sMotionManager.deviceMotionAvailable)
 	{
 		[sMotionManager startDeviceMotionUpdates];
 		[sMotionManager setDeviceMotionUpdateInterval: sUpdateInterval];
 	}
-}
 
-void CoreMotionStart()
-{
-	if (sMotionQueue == nil)
-		sMotionQueue = [[NSOperationQueue alloc] init];
-
-	if (sMotionManager == nil)
+	if(initMotionManager && sMotionManager.accelerometerAvailable)
 	{
-		sMotionManager = [[CMMotionManager alloc] init];
-
-		StartGyroAndMotionUpdates();
-
-		if (sMotionManager.accelerometerAvailable)
+		int frequency = UnityGetAccelerometerFrequency();
+		if (frequency > 0)
 		{
-			extern int UnityGetAccelerometerFrequency();
-			int frequency = UnityGetAccelerometerFrequency();
-			if (frequency > 0)
-			{
-				[sMotionManager startAccelerometerUpdatesToQueue: sMotionQueue withHandler: ^( CMAccelerometerData* data, NSError* error) {
-					Vector3f res = UnityReorientVector3(data.acceleration.x, data.acceleration.y, data.acceleration.z);
-					UnityDidAccelerate(res.x, res.y, res.z, data.timestamp);
-				}];
-				[sMotionManager setAccelerometerUpdateInterval: 1.0 / frequency];
-			}
+			[sMotionManager startAccelerometerUpdatesToQueue: sMotionQueue withHandler:^( CMAccelerometerData* data, NSError* error){
+				Vector3f res = UnityReorientVector3(data.acceleration.x, data.acceleration.y, data.acceleration.z);
+				UnityDidAccelerate(res.x, res.y, res.z, data.timestamp);
+			}];
+			[sMotionManager setAccelerometerUpdateInterval:1.0f/frequency];
 		}
 	}
-	else
-	{
-		StartGyroAndMotionUpdates();
-	}
 }
 
-void CoreMotionStop()
+extern "C" void UnityCoreMotionStop()
 {
-	if (sMotionManager != nil)
+	if(sMotionManager != nil)
 	{
 		[sMotionManager stopGyroUpdates];
 		[sMotionManager stopDeviceMotionUpdates];
 	}
 }
 
-void SetGyroUpdateInterval(int idx, float interval)
+
+extern "C" void UnitySetGyroUpdateInterval(int idx, float interval)
 {
-	if (interval < (1.0f / 60.0f))
-		interval = (1.0f / 60.0f);
-	else if (interval > (1.0f))
-		interval = 1.0f;
+	static const float _MinUpdateInterval = 1.0f/60.0f;
+	static const float _MaxUpdateInterval = 1.0f;
+
+	if(interval < _MinUpdateInterval)		interval = _MinUpdateInterval;
+	else if(interval > _MaxUpdateInterval)	interval = _MaxUpdateInterval;
 
 	sUserUpdateInterval = interval;
 
-	if (sMotionManager)
+	if(sMotionManager)
 	{
 		sUpdateInterval = interval;
 
-		[sMotionManager setGyroUpdateInterval: interval];
-		[sMotionManager setDeviceMotionUpdateInterval: interval];
+		[sMotionManager setGyroUpdateInterval:interval];
+		[sMotionManager setDeviceMotionUpdateInterval:interval];
 	}
 }
 
-float GetGyroUpdateInterval(int idx)
+extern "C" float UnityGetGyroUpdateInterval(int idx)
 {
 	return sUpdateInterval;
 }
 
-void UpdateGyroData()
+extern "C" void UnityUpdateGyroData()
 {
 	CMRotationRate rotationRate = { 0.0, 0.0, 0.0 };
 	CMRotationRate rotationRateUnbiased = { 0.0, 0.0, 0.0 };
@@ -290,22 +274,22 @@ void UpdateGyroData()
 	}
 
 	Vector3f reorientedRotRate = UnityReorientVector3(rotationRate.x, rotationRate.y, rotationRate.z);
-	SetGyroRotationRate(0, reorientedRotRate.x, reorientedRotRate.y, reorientedRotRate.z);
+	UnitySensorsSetGyroRotationRate(0, reorientedRotRate.x, reorientedRotRate.y, reorientedRotRate.z);
 
 	Vector3f reorientedRotRateUnbiased = UnityReorientVector3(rotationRateUnbiased.x, rotationRateUnbiased.y, rotationRateUnbiased.z);
-	SetGyroRotationRateUnbiased(0, reorientedRotRateUnbiased.x, reorientedRotRateUnbiased.y, reorientedRotRateUnbiased.z);
+	UnitySensorsSetGyroRotationRateUnbiased(0, reorientedRotRateUnbiased.x, reorientedRotRateUnbiased.y, reorientedRotRateUnbiased.z);
 
 	Vector3f reorientedUserAcc = UnityReorientVector3(userAcceleration.x, userAcceleration.y, userAcceleration.z);
-	SetUserAcceleration(0, reorientedUserAcc.x, reorientedUserAcc.y, reorientedUserAcc.z);
+	UnitySensorsSetUserAcceleration(0, reorientedUserAcc.x, reorientedUserAcc.y, reorientedUserAcc.z);
 
 	Vector3f reorientedG = UnityReorientVector3(gravity.x, gravity.y, gravity.z);
-	SetGravity(0, reorientedG.x, reorientedG.y, reorientedG.z);
+	UnitySensorsSetGravity(0, reorientedG.x, reorientedG.y, reorientedG.z);
 
 	Quaternion4f reorientedAtt = UnityReorientQuaternion(attitude.x, attitude.y, attitude.z, attitude.w);
-	SetAttitude(0, reorientedAtt.x, reorientedAtt.y, reorientedAtt.z, reorientedAtt.w);
+	UnitySensorsSetAttitude(0, reorientedAtt.x, reorientedAtt.y, reorientedAtt.z, reorientedAtt.w);
 }
 
-bool IsGyroEnabled(int idx)
+extern "C" bool UnityIsGyroEnabled(int idx)
 {
 	if (sMotionManager == nil)
 		return false;
@@ -313,7 +297,7 @@ bool IsGyroEnabled(int idx)
 	return sMotionManager.gyroAvailable && sMotionManager.gyroActive;
 }
 
-bool IsGyroAvailable()
+extern "C" bool UnityIsGyroAvailable()
 {
 	if (sMotionManager != nil)
 		return sMotionManager.gyroAvailable;

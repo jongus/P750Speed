@@ -8,20 +8,24 @@
 #include "UI/UnityView.h"
 #include "iPhone_OrientationSupport.h"
 #include "Unity/DisplayManager.h"
-#include "Unity/UnityInterface.h"
 
 #import <QuartzCore/QuartzCore.h>
 #import <UIKit/UIApplication.h>
 
 #include "objc/runtime.h"
 
-static ScreenOrientation _curOrientation				= orientationUnknown;
-static ScreenOrientation _nativeRequestedOrientation	= orientationUnknown;
+static ScreenOrientation	_curOrientation				= orientationUnknown;
+static ScreenOrientation	_nativeRequestedOrientation	= orientationUnknown;
+static DisplayConnection*	_mainDisplay				= nil;
 
-static DisplayConnection*	_mainDisplay	= nil;
 
-void UnityFinishRendering();
+bool _shouldAttemptReorientation = false;
 
+
+UIWindow*			UnityGetMainWindow()		{ return _mainDisplay->window; }
+UIViewController*	UnityGetGLViewController()	{ return GetAppController().rootViewController; }
+UIView*				UnityGetGLView()			{ return GetAppController().unityView; }
+ScreenOrientation	UnityCurrentOrientation()	{ return _curOrientation; }
 
 // TODO: this will be removed in upcoming versions of unity
 // we started tearing apart view handling code and at some point we started to have cur orient in 2 places
@@ -32,21 +36,13 @@ void UnityFinishRendering();
 void UnityUpdateCurrentOrientationValue(ScreenOrientation orient)	{ _curOrientation = orient; }
 
 
-bool _shouldAttemptReorientation = false;
 
-UIWindow*           UnityGetMainWindow()		{ return _mainDisplay->window; }
-UIViewController*   UnityGetGLViewController()	{ return GetAppController().rootViewController; }
-UIView*             UnityGetGLView()			{ return GetAppController().unityView; }
-ScreenOrientation   UnityCurrentOrientation()	{ return _curOrientation; }
-
-
-
-void UnityStartActivityIndicator()
+extern "C" void UnityStartActivityIndicator()
 {
 	ShowActivityIndicator(_mainDisplay->view);
 }
 
-void UnityStopActivityIndicator()
+extern "C" void UnityStopActivityIndicator()
 {
 	HideActivityIndicator();
 }
@@ -82,6 +78,7 @@ static void UpdateOrientationFromController(UIViewController* controller)
 {
 	_curOrientation = ConvertToUnityScreenOrientation(controller.interfaceOrientation,0);
 	UnitySetScreenOrientation(_curOrientation);
+	AppController_RenderPluginMethodWithArg(@selector(onOrientationChange:), (id)_curOrientation);
 	OrientTo(_curOrientation);
 }
 
@@ -96,20 +93,29 @@ void OnUnityReady()
 	UnityStopActivityIndicator();
 	HideSplashScreen();
 
-	// this is called after level was loaded, so some orientation constraints might have changed
+	// this is called after level was loaded, so orientation constraints or resolution might have changed
 	UpdateOrientationFromController(GetAppController().rootViewController);
+	[GetAppController().unityView recreateGLESSurface];
+
 	[GetAppController() showGameUI:_mainDisplay->window];
 
-	// immediately render 1st frame in order to avoid occasional black screen
-	// we do it twice to fill both buffers with meaningful contents.
-	// NB: recreateGLESSurface will redraw stuff inside in any case, and handle resize in case orientation changed
-	[GetAppController().unityView recreateGLESSurface];
+	// here goes the magic:
+	// we run unity loop once (Start will be called on scripts)
+	// but we do not present, and then do normal repaint (with present)
+	// it is done to properly hande resolution request in Start
+	// and we want to draw right after showing window, to avoid black frame creeping in
+	extern bool _skipPresent;
+
+	_skipPresent = true;
 	UnityPlayerLoop();
+	_skipPresent = false;
+	[GetAppController() repaint];
+
 
 	[UIView setAnimationsEnabled:YES];
 }
 
-void NotifyAutoOrientationChange()
+extern "C" void NotifyAutoOrientationChange()
 {
 	_shouldAttemptReorientation = true;
 }
@@ -155,7 +161,7 @@ void RequestNativeOrientation(ScreenOrientation targetOrient)
 
 void CheckOrientationRequest()
 {
-	ScreenOrientation requestedOrient = UnityRequestedScreenOrientation();
+	ScreenOrientation requestedOrient = (ScreenOrientation)UnityRequestedScreenOrientation();
 	if(requestedOrient == autorotation)
 	{
 		if(_ios50orNewer && _shouldAttemptReorientation)
@@ -181,7 +187,7 @@ float ScreenScaleFactor()
 	return [UIScreen mainScreen].scale;
 }
 
-void SetScreenFactorFromScreen(UIView* view)
+void SetScaleFactorFromScreen(UIView* view)
 {
 	if( [view respondsToSelector:@selector(setContentScaleFactor:)] )
 		[view setContentScaleFactor: ScreenScaleFactor()];

@@ -2,7 +2,6 @@
 #define _TRAMPOLINE_UI_UNITYVIEW_H_
 
 #import <UIKit/UIKit.h>
-#include "iPhone_Common.h"
 #include "Unity/GlesHelper.h"
 
 @interface UnityView : GLView

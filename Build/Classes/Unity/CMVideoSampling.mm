@@ -4,7 +4,7 @@
 #include "CVTextureCache.h"
 #include "GLESHelper.h"
 
-#include <OpenGLES/ES1/gl.h>
+#include <OpenGLES/ES2/gl.h>
 #include <AVFoundation/AVFoundation.h>
 
 void CMVideoSampling_Initialize(CMVideoSampling* sampling)
@@ -49,7 +49,7 @@ int CMVideoSampling_SampleBuffer(CMVideoSampling* sampling, void* buffer, int w,
         }
         sampling->cvTextureCacheTexture = CreateTextureFromCVTextureCache(sampling->cvTextureCache, cvImageBuffer, w, h, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_BYTE);
         if(sampling->cvTextureCacheTexture)
-            retTex = GetGLTextureFromTextureCache(sampling->cvTextureCacheTexture);
+            retTex = GetGLTextureFromCVTextureCache(sampling->cvTextureCacheTexture);
     }
     else
     {
@@ -84,5 +84,5 @@ int CMVideoSampling_SampleBuffer(CMVideoSampling* sampling, void* buffer, int w,
 
 int  CMVideoSampling_LastSampledTexture(CMVideoSampling* sampling)
 {
-    return sampling->cvTextureCacheTexture ? GetGLTextureFromTextureCache(sampling->cvTextureCacheTexture) : sampling->glTex[0];
+    return sampling->cvTextureCacheTexture ? GetGLTextureFromCVTextureCache(sampling->cvTextureCacheTexture) : sampling->glTex[0];
 }

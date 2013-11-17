@@ -53,27 +53,27 @@ UIInterfaceOrientation ConvertToIosScreenOrientation(ScreenOrientation orient)
 
 ScreenOrientation ConvertToUnityScreenOrientation(UIInterfaceOrientation hwOrient, EnabledOrientation* outAutorotOrient)
 {
-    EnabledOrientation autorotOrient     = kAutorotateToPortrait;
+    EnabledOrientation autorotOrient     = autorotPortrait;
     ScreenOrientation  unityScreenOrient = portrait;
 
     switch (hwOrient)
     {
         case UIInterfaceOrientationPortrait:
-            autorotOrient     = kAutorotateToPortrait;
+            autorotOrient     = autorotPortrait;
             unityScreenOrient = portrait;
             break;
         case UIInterfaceOrientationPortraitUpsideDown:
-            autorotOrient     = kAutorotateToPortraitUpsideDown;
+            autorotOrient     = autorotPortraitUpsideDown;
             unityScreenOrient = portraitUpsideDown;
             break;
         // landscape left/right have switched values in device/screen orientation
         // though unity docs are adjusted with device orientation values, so swap here
         case UIInterfaceOrientationLandscapeLeft:
-            autorotOrient     = kAutorotateToLandscapeRight;
+            autorotOrient     = autorotLandscapeRight;
             unityScreenOrient = landscapeRight;
             break;
         case UIInterfaceOrientationLandscapeRight:
-            autorotOrient     = kAutorotateToLandscapeLeft;
+            autorotOrient     = autorotLandscapeLeft;
             unityScreenOrient = landscapeLeft;
             break;
     }
@@ -89,3 +89,7 @@ void OrientView(UIView* view, ScreenOrientation target)
     view.transform  = TransformForOrientation(target);
     view.bounds     = ContentRectForOrientation(target);
 }
+
+
+extern "C" __attribute__((visibility ("default"))) NSString * const kUnityViewWillRotate = @"kUnityViewWillRotate";
+extern "C" __attribute__((visibility ("default"))) NSString * const kUnityViewDidRotate  = @"kUnityViewDidRotate";

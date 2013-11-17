@@ -2,58 +2,26 @@
 #ifndef _TRAMPOLINE_IPHONE_COMMON_H_
 #define _TRAMPOLINE_IPHONE_COMMON_H_
 
+#include "Preprocessor.h"
 #include <stdarg.h>
 
-//------------------------------------------------------------------------------
-
-// magic: ensuring proper compiler/xcode/whatever selection
-#ifndef __clang__
-#error please use clang compiler.
-#endif
-
-// NOT the best way but apple do not care about adding extensions properly
-#if __clang_major__ < 3
-#error please use xcode 4.2 or newer
-#endif
 
 //------------------------------------------------------------------------------
 
 // ios/sdk version
-
-extern	bool	_ios43orNewer;
-extern	bool	_ios50orNewer;
-extern	bool	_ios60orNewer;
-extern	bool	_ios70orNewer;
-
-#ifdef __IPHONE_6_0
-	#define UNITY_PRE_IOS6_SDK (__IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_6_0)
-#else
-	#define UNITY_PRE_IOS6_SDK 1
-#endif
-
-#ifdef __IPHONE_6_0
-	#define UNITY_PRE_IOS6_TARGET (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0)
-#else
-	#define UNITY_PRE_IOS6_TARGET 1
-#endif
-
-
-#ifdef __IPHONE_7_0
-	#define UNITY_PRE_IOS7_SDK (__IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_7_0)
-#else
-	#define UNITY_PRE_IOS7_SDK 1
-#endif
-
-#ifdef __IPHONE_7_0
-	#define UNITY_PRE_IOS7_TARGET (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0)
-#else
-	#define UNITY_PRE_IOS7_TARGET 1
+#ifdef __cplusplus
+	extern	bool	_ios42orNewer;
+	extern	bool	_ios43orNewer;
+	extern	bool	_ios50orNewer;
+	extern	bool	_ios60orNewer;
+	extern	bool	_ios70orNewer;
 #endif
 
 
 //------------------------------------------------------------------------------
 
 typedef enum
+DeviceGeneration
 {
 	deviceUnknown = 0,
 	deviceiPhone = 1,
@@ -81,6 +49,7 @@ typedef enum
 DeviceGeneration;
 
 typedef enum
+ScreenOrientation
 {
     orientationUnknown,
     portrait,
@@ -92,10 +61,22 @@ typedef enum
 }
 ScreenOrientation;
 
+typedef enum
+EnabledOrientation
+{
+    autorotPortrait = 1,
+    autorotPortraitUpsideDown = 2,
+    autorotLandscapeLeft = 4,
+    autorotLandscapeRight = 8
+}
+EnabledOrientation;
+
+
 struct UnityFrameStats;
 
 
 typedef enum
+LogType
 {
 	/// LogType used for Errors.
 	LogType_Error = 0,
@@ -114,27 +95,11 @@ typedef enum
 }
 LogType;
 
-typedef void (*LogEntryHandler) (LogType logType, const char* log, va_list list);
-void SetLogEntryHandler(LogEntryHandler newHandler);
 
-//------------------------------------------------------------------------------
-
-#define ENABLE_UNITY_DEBUG_LOG 0
-
-#if ENABLE_UNITY_DEBUG_LOG
-	#define UNITY_DBG_LOG(...)				\
-		do 									\
-		{									\
-			printf_console(__VA_ARGS__);	\
-		}									\
-		while(0)
-#else
-	#define UNITY_DBG_LOG(...)				\
-		do 									\
-		{									\
-		}									\
-		while(0)
-#endif // ENABLE_UNITY_DEBUG_LOG
+#ifdef __cplusplus
+	typedef bool (*LogEntryHandler) (LogType logType, const char* log, va_list list);
+	void SetLogEntryHandler(LogEntryHandler newHandler);
+#endif
 
 
 #endif // _TRAMPOLINE_IPHONE_COMMON_H_

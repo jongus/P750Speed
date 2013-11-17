@@ -6,15 +6,7 @@
 
 #define ENABLE_DETAILED_GC_STATS 0
 
-void*	UnityCreateProfilerCounter( const char* name );
-void	UnityDestroyProfilerCounter( void* counter );
-void	UnityStartProfilerCounter( void* counter );
-void	UnityEndProfilerCounter( void* counter );
-void 	UnityFinishRendering();
-
-
 #if ENABLE_INTERNAL_PROFILER
-
 
 struct UnityFrameStats
 {

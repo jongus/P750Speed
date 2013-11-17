@@ -3,16 +3,16 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
+#import <OpenGLES/ES2/gl.h>
+#import <OpenGLES/ES2/glext.h>
 
 extern "C" bool AllocateRenderBufferStorageFromEAGLLayer(void* eaglContext, void* eaglLayer)
 {
-    return [(EAGLContext*)eaglContext renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:(CAEAGLLayer*)eaglLayer];
+    return [(EAGLContext*)eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer*)eaglLayer];
 }
 extern "C" void DeallocateRenderBufferStorageFromEAGLLayer(void* eaglContext)
 {
-    [(EAGLContext*)eaglContext renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:nil];
+    [(EAGLContext*)eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:nil];
 }
 
 EAGLContext* CreateContext(EAGLContext* parent)
@@ -25,9 +25,8 @@ EAGLContext* CreateContext(EAGLContext* parent)
     }
     else
     {
-        extern bool UnityIsRenderingAPISupported(int renderingApi);
-
-        for(int api = kEAGLRenderingAPIOpenGLES2 ; api >= kEAGLRenderingAPIOpenGLES1 && !ret ; --api)
+        // we do not support gles1.1 anymore, but leave the code structire as is to be ready for gles3 when it arrives
+        for(int api = kEAGLRenderingAPIOpenGLES2 ; api >= kEAGLRenderingAPIOpenGLES2 && !ret ; --api)
         {
             if (UnityIsRenderingAPISupported(api))
                 ret = [[EAGLContext alloc] initWithAPI:api];

@@ -108,7 +108,7 @@ static BOOL ShouldAutorotateToInterfaceOrientation_SplashImpl(id, SEL, UIInterfa
 
     _splash   = [[SplashScreen alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
 
-    SetScreenFactorFromScreen(_splash);
+    SetScaleFactorFromScreen(_splash);
     if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone)
     {
         _splash.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
