@@ -13,7 +13,8 @@ public class ScriptMain : MonoBehaviour {
 	private tk2dSprite spritePaginationMarked;
 	private ScreenOrientation orientationOld = ScreenOrientation.LandscapeLeft;
 	private int iWaitForGPS = 0; //The first updates tend to be wrong...
-	private double dLastTimestamp = 0.0d; //Updates when we move
+	private double dGPSLastTimestamp = 0.0d; //Updates when we move
+	private double dCompassLastTimestamp = 0.0d; //Updates when we move
 	private double dLastLat = 0.0d;
 	private double dLastLon = 0.0d;
 	private double[] adAvgSpeed;	
@@ -39,6 +40,9 @@ public class ScriptMain : MonoBehaviour {
 		Screen.autorotateToLandscapeLeft = true;
 		Screen.autorotateToLandscapeRight = true;
 		Screen.orientation = ScreenOrientation.AutoRotation;
+
+		//Get data from playerprefs
+		iCurrentScreen = PlayerPrefs.GetInt("iCurrentScreen", 0);
 		
 		//Grab objects
 		tmDebug = GameObject.Find ("tmDebug").GetComponent<tk2dTextMesh>(); //BUG
@@ -48,10 +52,11 @@ public class ScriptMain : MonoBehaviour {
 		tmHeading = GameObject.Find ("tmHeading").GetComponent<tk2dTextMesh>();
 		goWarning = GameObject.Find ("/goWarning");
 		
-		//And start GPS
+		//And start GPS + compass
 		adAvgSpeed = new double[3];
-		dLastTimestamp = dNowInEpoch();
+		//dGPSLastTimestamp = dNowInEpoch();
 		Input.location.Start (1.0f, 0.1f);
+		Input.compass.enabled = true;
 	}
 	
 	// Update is called every frame, if the
@@ -73,26 +78,13 @@ public class ScriptMain : MonoBehaviour {
 			}
 			iLocationStatus = 1;
 		}
-		
-		//Save latest screen orientation
-		if(orientationOld != Screen.orientation) {
-			//We have changed orientation, save it please!
-			if(Screen.orientation == ScreenOrientation.LandscapeLeft ) {
-				PlayerPrefs.SetInt("Screen.orientation", 0);	
-			} else if (Screen.orientation == ScreenOrientation.LandscapeRight  ) {
-				PlayerPrefs.SetInt("Screen.orientation", 1);
-			}
-			orientationOld = Screen.orientation;
-		}
-		
+
 		//Okey, we got some kind of position
 		if(iLocationStatus == 0) {
-			UpdateHeading(Input.compass.trueHeading);
-			if(Input.location.lastData.timestamp != dLastTimestamp ) {
+			if(Input.location.lastData.timestamp != dGPSLastTimestamp ) {
 				//New data from gps!
 				CalculateMovement();
 				UpdateSpeed(dCurSpeed);
-				tmDebug.text =  "dCurSpeed: " + dCurSpeed.ToString("#0.0"); //BUG
 			} else if((dNowInEpoch() - Input.location.lastData.timestamp) > 3.0d) {
 				//We are not moving?? Handle speed in a nice way, not a real error!
 				UpdateSpeed(-1.0d);
@@ -100,6 +92,13 @@ public class ScriptMain : MonoBehaviour {
 			}
 			 
 		}
+		if(Input.compass.timestamp != dCompassLastTimestamp ){
+			UpdateHeading(Input.compass.trueHeading);
+			dCompassLastTimestamp = Input.compass.timestamp;
+		} else if((dNowInEpoch() - Input.compass.timestamp) > 3.0d) {
+			UpdateHeading (-1.0f);
+		}
+		tmDebug.text = Time.deltaTime.ToString ();
 		tmDebug.Commit (); //BUG
 	}
 	
@@ -108,18 +107,30 @@ public class ScriptMain : MonoBehaviour {
 		if(gesture.Direction == FingerGestures.SwipeDirection.Right) {
 			iCurrentScreen --;
 			if(iCurrentScreen < 0) iCurrentScreen = 0;
-			ShowScreen (iCurrentScreen);
+			ShowScreen (iCurrentScreen, 1.0f);
 		} else if(gesture.Direction == FingerGestures.SwipeDirection.Left) {
 			iCurrentScreen ++;
 			if(iCurrentScreen > 2) iCurrentScreen = 2;
-			ShowScreen (iCurrentScreen);
+			ShowScreen (iCurrentScreen, 1.0f);
 		}
 	}
 	
 	void OnApplicationPause(bool pauseStatus) {
         //pauseStatus = true -> applicationDidEnterBackground();
 		//pauseStatus = false -> applicationDidBecomeActive();
-    }
+		if(pauseStatus == true) {
+			//We have changed orientation, save it please!
+			if(Screen.orientation == ScreenOrientation.LandscapeLeft ) {
+				PlayerPrefs.SetInt("Screen.orientation", 0);	
+			} else if (Screen.orientation == ScreenOrientation.LandscapeRight  ) {
+				PlayerPrefs.SetInt("Screen.orientation", 1);
+			}
+			PlayerPrefs.SetInt("iCurrentScreen", iCurrentScreen);
+		} else {
+			iCurrentScreen = PlayerPrefs.GetInt("iCurrentScreen", 0);
+			ShowScreen (iCurrentScreen, 0.0f);
+		}
+	}
 	
 	private void UpdateSpeed(double dSpeed) { 
 		if(dSpeed >= 0.0d) {
@@ -135,11 +146,11 @@ public class ScriptMain : MonoBehaviour {
 		tmCurrentSpeedDecimal.Commit ();
 	}
 	
-	private void UpdateHeading(double dHeading) { 
-		if(dHeading >= 0.0d) {
-			tmHeading.text = Math.Round (dBearing, 0).ToString ("#0") + "°";
+	private void UpdateHeading(float fHeading) { 
+		if(fHeading >= 0.0d) {
+			tmHeading.text = Math.Round (fHeading, 0).ToString ("#0") + "°";
 		} else {
-			tmHeading.text = "---";
+			tmHeading.text = "---°";
 		}
 		tmHeading.Commit ();
 	}
@@ -157,8 +168,8 @@ public class ScriptMain : MonoBehaviour {
 			//Okey, try to calculate speed
 			double dDist = CalculateDistanceBetweenGPSCoordinates (dLastLon, dLastLat, (double)liTmp.longitude , (double)liTmp.latitude );
 			dAccDist += dDist;
-			double dTimeDif = Math.Abs(liTmp.timestamp - dLastTimestamp );
-			double dMperSec = (dDist / Math.Abs(liTmp.timestamp - dLastTimestamp ));
+			double dTimeDif = Math.Abs(liTmp.timestamp - dGPSLastTimestamp );
+			double dMperSec = (dDist / Math.Abs(liTmp.timestamp - dGPSLastTimestamp ));
 			double dSpeed = (dMperSec * dMS2KN);
 			
 			//move around speed
@@ -186,19 +197,19 @@ public class ScriptMain : MonoBehaviour {
 		//Save current pos as last pos
 		dLastLat = (double)liTmp.latitude;
 		dLastLon = (double)liTmp.longitude;
-		dLastTimestamp = liTmp.timestamp;   
+		dGPSLastTimestamp = liTmp.timestamp;   
 	}
 	
-	void ShowScreen(int iScreenId) {
+	void ShowScreen(int iScreenId, float fSpeed) {
 		//Handels showing of the correct screen when swiping and so on...
 		if(iScreenId == 2) {
-			iTween.MoveTo(gameObject, new Vector3(-102.4f, 0.0f, 0.0f), 1.0f);
+			iTween.MoveTo(gameObject, new Vector3(-102.4f, 0.0f, 0.0f), fSpeed);
 			spritePaginationMarked.transform.position = new Vector3(1.0f, -17.8f, -1.0f);
 		} else if(iScreenId == 1){
-			iTween.MoveTo(gameObject, new Vector3(-51.2f, 0.0f, 0.0f), 1.0f);
+			iTween.MoveTo(gameObject, new Vector3(-51.2f, 0.0f, 0.0f), fSpeed);
 			spritePaginationMarked.transform.position = new Vector3(0.0f, -17.8f, -1.0f);
 		} else { //Asume 0
-			iTween.MoveTo(gameObject, new Vector3(0.0f, 0.0f, 0.0f), 1.0f);
+			iTween.MoveTo(gameObject, new Vector3(0.0f, 0.0f, 0.0f), fSpeed);
 			spritePaginationMarked.transform.position = new Vector3(-1.0f, -17.8f, -1.0f);
 		}
 	}

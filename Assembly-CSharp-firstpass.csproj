@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{C93045C2-B026-F95B-25B4-34DD5D117CC4}</ProjectGuid>
+	<ProjectGuid>{5DD00F47-79A2-0512-BA04-201F41CA9F30}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -80,12 +80,12 @@
      <Compile Include="Assets\Plugins\FingerGestures\Scripts\Toolbox\TBPinchToScale.cs" />
      <Compile Include="Assets\Plugins\FingerGestures\Scripts\Toolbox\TBQuickSetup.cs" />
      <Compile Include="Assets\Plugins\FingerGestures\Scripts\Toolbox\TBTwistToRotate.cs" />
-     <None Include="Assets\Fonts\SmallNumbers_Decimals.fnt" />
+     <None Include="Assets\Fonts\Smallnumbers_decimals.fnt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\MonoBehaviour.cs.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Editor Window.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitSolidVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Function Call From Menu.js.txt" />
-     <None Include="Assets\Fonts\BigNumbers_Decimals.fnt" />
+     <None Include="Assets\Fonts\Bignumbers_decimals.fnt" />
      <None Include="Assets\TK2DROOT\tk2d\Goodies\TexturePacker\Exporter\2dtoolkit\exporter.xml" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\SolidVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Scriptable Wizard.cs.txt" />
@@ -103,7 +103,7 @@
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\Blend2TexVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.js.txt" />
-     <None Include="Assets\Fonts\SmallNumbers.fnt" />
+     <None Include="Assets\Fonts\Smallnumbers.fnt" />
      <None Include="Assets\TK2DROOT\tk2dUI\Shaders\DepthMaskSolid.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\AssetPostprocessor.functions.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.js.txt" />
@@ -111,7 +111,7 @@
      <None Include="Assets\Fonts\GeneralText.fnt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.boo.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitCutoutVertexColor.shader" />
-     <None Include="Assets\Fonts\BigNumbers.fnt" />
+     <None Include="Assets\Fonts\Bignumbers.fnt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\EditorWindow.functions.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Editor\EditorUtility.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\ScriptableWizard.functions.txt" />

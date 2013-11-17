@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{91DE12E2-DFFA-4BE9-D4D7-68A489401F79}</ProjectGuid>
+	<ProjectGuid>{DA480830-452C-36FB-2079-0B298EAA1174}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -140,12 +140,12 @@
      <Compile Include="Assets\TK2DROOT\tk2dUI\Editor\Core\tk2dUIMaskEditor.cs" />
      <Compile Include="Assets\TK2DROOT\tk2dUI\Editor\Core\tk2dUIMethodBindingHelper.cs" />
      <Compile Include="Assets\TK2DROOT\tk2dUI\Editor\Core\tk2dUISpriteAnimatorEditor.cs" />
-     <None Include="Assets\Fonts\SmallNumbers_Decimals.fnt" />
+     <None Include="Assets\Fonts\Smallnumbers_decimals.fnt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\MonoBehaviour.cs.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Editor Window.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitSolidVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Function Call From Menu.js.txt" />
-     <None Include="Assets\Fonts\BigNumbers_Decimals.fnt" />
+     <None Include="Assets\Fonts\Bignumbers_decimals.fnt" />
      <None Include="Assets\TK2DROOT\tk2d\Goodies\TexturePacker\Exporter\2dtoolkit\exporter.xml" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\SolidVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Scriptable Wizard.cs.txt" />
@@ -163,7 +163,7 @@
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.cs.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\Blend2TexVertexColor.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.js.txt" />
-     <None Include="Assets\Fonts\SmallNumbers.fnt" />
+     <None Include="Assets\Fonts\Smallnumbers.fnt" />
      <None Include="Assets\TK2DROOT\tk2dUI\Shaders\DepthMaskSolid.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\AssetPostprocessor.functions.txt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Empty Class.js.txt" />
@@ -171,7 +171,7 @@
      <None Include="Assets\Fonts\GeneralText.fnt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\Custom Editor.boo.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Shaders\LitCutoutVertexColor.shader" />
-     <None Include="Assets\Fonts\BigNumbers.fnt" />
+     <None Include="Assets\Fonts\Bignumbers.fnt" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\EditorWindow.functions.txt" />
      <None Include="Assets\TK2DROOT\tk2d\Editor\EditorUtility.shader" />
      <None Include="Assets\CreateScriptDialog\SmartScriptTemplates\ScriptableWizard.functions.txt" />
@@ -213,11 +213,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass-vs.csproj">
-      <Project>{C93045C2-B026-F95B-25B4-34DD5D117CC4}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
+      <Project>{5DD00F47-79A2-0512-BA04-201F41CA9F30}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp-vs.csproj">
-      <Project>{9C8CAF22-3F7A-ED70-3ECB-5A120D3721CC}</Project>      <Name>Assembly-CSharp-vs</Name>    </ProjectReference>
+      <Project>{557AAB1E-203C-B359-F605-60C2B2BFDD9C}</Project>      <Name>Assembly-CSharp-vs</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp-Editor-firstpass-vs.csproj">
-      <Project>{D2F8EED5-692B-FC3A-F231-0CC9BE3E3D63}</Project>      <Name>Assembly-CSharp-Editor-firstpass-vs</Name>    </ProjectReference>
+      <Project>{3FB2826A-211A-C1B7-593B-12CE9F8B5E80}</Project>      <Name>Assembly-CSharp-Editor-firstpass-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
