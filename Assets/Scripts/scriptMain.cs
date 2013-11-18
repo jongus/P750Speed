@@ -203,13 +203,25 @@ public class ScriptMain : MonoBehaviour {
 	void ShowScreen(int iScreenId, float fSpeed) {
 		//Handels showing of the correct screen when swiping and so on...
 		if(iScreenId == 2) {
-			iTween.MoveTo(gameObject, new Vector3(-102.4f, 0.0f, 0.0f), fSpeed);
+			if(fSpeed > 0.0f) {
+				iTween.MoveTo(gameObject, new Vector3(-102.4f, 0.0f, 0.0f), fSpeed);
+			} else {
+				gameObject.transform.position = new Vector3(-102.4f, 0.0f, 0.0f);
+			}
 			spritePaginationMarked.transform.position = new Vector3(1.0f, -17.8f, -1.0f);
 		} else if(iScreenId == 1){
-			iTween.MoveTo(gameObject, new Vector3(-51.2f, 0.0f, 0.0f), fSpeed);
+			if(fSpeed > 0.0f) {
+				iTween.MoveTo(gameObject, new Vector3(-51.2f, 0.0f, 0.0f), fSpeed);
+			} else {
+				gameObject.transform.position = new Vector3(-51.2f, 0.0f, 0.0f);
+			}
 			spritePaginationMarked.transform.position = new Vector3(0.0f, -17.8f, -1.0f);
 		} else { //Asume 0
-			iTween.MoveTo(gameObject, new Vector3(0.0f, 0.0f, 0.0f), fSpeed);
+			if(fSpeed > 0.0f) {
+				iTween.MoveTo(gameObject, new Vector3(0.0f, 0.0f, 0.0f), fSpeed);
+			} else {
+				gameObject.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+			}
 			spritePaginationMarked.transform.position = new Vector3(-1.0f, -17.8f, -1.0f);
 		}
 	}
