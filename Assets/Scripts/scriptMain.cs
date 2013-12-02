@@ -95,9 +95,22 @@ public class ScriptMain : MonoBehaviour {
 			}
 		}
 		if(fHeadingTime < 0.2f){
-			fAvgHeading += Input.compass.trueHeading;
-			iHeadingValues ++;
-			fHeadingTime += Time.deltaTime;
+			float fHeading = Input.compass.trueHeading;
+			if(((fAvgHeading / iHeadingValues) < 180.0f) & (fHeading >= 180.0f)) {
+				UpdateHeading(fAvgHeading / iHeadingValues);
+				iHeadingValues = 0;
+				fHeadingTime = 0.0f;
+				fAvgHeading = 0.0f;
+			} else if(((fAvgHeading / iHeadingValues) > 180.0f) & (fHeading <= 180.0f)) {
+				UpdateHeading(fAvgHeading / iHeadingValues);
+				iHeadingValues = 0;
+				fHeadingTime = 0.0f;
+				fAvgHeading = 0.0f;
+			} else {
+				fAvgHeading += Input.compass.trueHeading;
+				iHeadingValues ++;
+				fHeadingTime += Time.deltaTime;
+			}
 		} else {
 			UpdateHeading(fAvgHeading / iHeadingValues);
 			iHeadingValues = 0;
