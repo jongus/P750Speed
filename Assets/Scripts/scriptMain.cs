@@ -18,9 +18,12 @@ public class ScriptMain : MonoBehaviour {
 	private double dLastLat = 0.0d;
 	private double dLastLon = 0.0d;
 	private double[] adAvgSpeed;	
-	private double dBearing = 0.0d;
 	private double dCurSpeed = -1.0d;
 	private double dAccDist = 0.0d;
+	private float fAvgHeading = 0.0f;
+	private float fHeadingTime = 0.0f;
+	private int iHeadingValues = 0;
+
 	
 	//Text Meshes
 	private tk2dTextMesh tmDebug; //BUG
@@ -90,10 +93,18 @@ public class ScriptMain : MonoBehaviour {
 				UpdateSpeed(-1.0d);
 				//UpdateHeading(-1.0d);
 			}
-			 
+		}
+		if(fHeadingTime < 0.2f){
+			fAvgHeading += Input.compass.trueHeading;
+			iHeadingValues ++;
+			fHeadingTime += Time.deltaTime;
+		} else {
+			UpdateHeading(fAvgHeading / iHeadingValues);
+			iHeadingValues = 0;
+			fHeadingTime = 0.0f;
+			fAvgHeading = 0.0f;
 		}
 		if(Input.compass.timestamp != dCompassLastTimestamp ){
-			UpdateHeading(Input.compass.trueHeading);
 			dCompassLastTimestamp = Input.compass.timestamp;
 		} else if((dNowInEpoch() - Input.compass.timestamp) > 3.0d) {
 			UpdateHeading (-1.0f);
