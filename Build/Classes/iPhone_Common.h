@@ -42,6 +42,8 @@ DeviceGeneration
 	deviceiPad4Gen = 16,
 	deviceiPhone5C = 17,
 	deviceiPhone5S = 18,
+	deviceiPad5Gen = 19,
+	deviceiPadMini2Gen = 20,
 	deviceiPhoneUnknown = 10001,
 	deviceiPadUnknown = 10002,
 	deviceiPodTouchUnknown = 10003,

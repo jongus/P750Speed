@@ -128,6 +128,15 @@ extern int 		UnityStringToKey(const char *name);
 extern void 	UnitySetKeyState (int key, bool state);
 #endif
 
+// WWW connection handling
+extern void		UnityReportWWWStatusError(void* udata, int status, const char* error);
+extern void		UnityReportWWWFailedWithError(void* udata, const char* error);
+
+extern void		UnityReportWWWReceivedResponse(void* udata, int status, unsigned expectedDataLength, const char* respHeader);
+extern void		UnityReportWWWReceivedData(void* udata, unsigned totalRead, unsigned expectedTotal);
+extern void		UnityReportWWWFinishedLoadingData(void* udata);
+extern void		UnityReportWWWSentData(void* udata, unsigned totalWritten, unsigned expectedTotal);
+
 #ifdef __cplusplus
 }
 #endif
@@ -209,6 +218,15 @@ extern void		UnitySendTouchesMoved(NSSet* touches, UIEvent* event);
 // extern "C" const char*	UnityDeviceModel();
 // extern "C" int			UnityDeviceGeneration()
 // extern "C" float			UnityDeviceDPI()
+
+// Unity/WWWConnection.mm
+// extern "C" void*			UnityStartWWWConnectionGet(void* udata, const void* headerDict, const char* url);
+// extern "C" void*			UnityStartWWWConnectionPost(void* udata, const void* headerDict, const char* url, const void* data, unsigned length);
+// extern "C" void			UnityDestroyWWWConnection(void* connection);
+// extern "C" void			UnityShouldCancelWWW(const void* connection);
+// extern "C" const void*	UnityGetWWWData(const void* connection);
+// extern "C" int			UnityGetWWWDataLength(const void* connection);
+// extern "C" const char*	UnityGetWWWURL(const void* connection);
 
 
 #endif // _TRAMPOLINE_UNITY_UNITYINTERFACE_H_

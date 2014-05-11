@@ -778,11 +778,22 @@ public abstract class tk2dBaseSprite : MonoBehaviour, tk2dRuntime.ISpriteCollect
 		PhysicMaterial physicsMaterial = collider?collider.sharedMaterial:null;
 		bool isTrigger = collider?collider.isTrigger:false;
 
+#if !(UNITY_3_5 || UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2)
+		PhysicsMaterial2D physicsMaterial2D = collider2D?collider2D.sharedMaterial:null;
+		if (collider2D != null) {
+			isTrigger = collider2D.isTrigger;
+		}
+#endif
+
 		boxCollider = gameObject.GetComponent<BoxCollider>();
 		meshCollider = gameObject.GetComponent<MeshCollider>();
 
 #if !(UNITY_3_5 || UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2)
 		boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
+		edgeCollider2D.Clear();
+		edgeCollider2D.AddRange( gameObject.GetComponents<EdgeCollider2D>() );
+		polygonCollider2D.Clear();
+		polygonCollider2D.AddRange( gameObject.GetComponents<PolygonCollider2D>() );
 #endif
 
 		// Sanitize colliders - get rid of unused / incorrect ones in editor
@@ -804,7 +815,7 @@ public abstract class tk2dBaseSprite : MonoBehaviour, tk2dRuntime.ISpriteCollect
 				}
 			}
 			edgeCollider2D.Clear();
-	#endif
+#endif
 
 			// Delete mismatched collider
 			if ((NeedBoxCollider() || sprite.colliderType == tk2dSpriteDefinition.ColliderType.Box) && meshCollider == null)
@@ -862,6 +873,24 @@ public abstract class tk2dBaseSprite : MonoBehaviour, tk2dRuntime.ISpriteCollect
 			collider.isTrigger = isTrigger;
 			collider.material = physicsMaterial;
 		}
+
+#if !(UNITY_3_5 || UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2)
+		if (boxCollider2D) {
+			boxCollider2D.isTrigger = isTrigger;
+			boxCollider2D.sharedMaterial = physicsMaterial2D;
+		}
+
+		foreach (EdgeCollider2D ec in edgeCollider2D) {
+			ec.isTrigger = isTrigger;
+			ec.sharedMaterial = physicsMaterial2D;
+		}
+
+		foreach (PolygonCollider2D pc in polygonCollider2D) {
+			pc.isTrigger = isTrigger;
+			pc.sharedMaterial = physicsMaterial2D;
+		}
+#endif
+
 	}
 #endif
 
@@ -877,6 +906,14 @@ public abstract class tk2dBaseSprite : MonoBehaviour, tk2dRuntime.ISpriteCollect
 #endif		
 	}
 
+#if UNITY_EDITOR
+	private void OnEnable() {
+		if (renderer != null && Collection != null && renderer.sharedMaterial == null && Collection.inst.needMaterialInstance) {
+			ForceBuild();
+		}
+	}
+#endif
+	
 	// Used by derived classes only
 	public void CreateSimpleBoxCollider() {
 		if (CurrentSprite == null) {

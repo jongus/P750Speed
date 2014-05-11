@@ -7,7 +7,7 @@ extern "C"
 	typedef void* gpointer;
 	typedef int gboolean;
 #if !(TARGET_IPHONE_SIMULATOR)
-	const char*			UnityIPhoneRuntimeVersion = "4.3.0f4";
+	const char*			UnityIPhoneRuntimeVersion = "4.3.4f1";
 	void				mono_dl_register_symbol (const char* name, void *addr);
 	extern int 			mono_ficall_flag;
 	void				mono_aot_register_module(gpointer *aot_info);
@@ -5148,14 +5148,14 @@ void RegisterAllStrippedInternalCalls ()
 	Register_UnityEngine_Sprite_get_texture ();
 	void Register_UnityEngine_Sprite_get_textureRect ();
 	Register_UnityEngine_Sprite_get_textureRect ();
-	void Register_UnityEngine_Sprite_get_textureRectOffset ();
-	Register_UnityEngine_Sprite_get_textureRectOffset ();
 	void Register_UnityEngine_Sprite_get_packed ();
 	Register_UnityEngine_Sprite_get_packed ();
 	void Register_UnityEngine_Sprite_get_packingMode ();
 	Register_UnityEngine_Sprite_get_packingMode ();
 	void Register_UnityEngine_Sprite_get_packingRotation ();
 	Register_UnityEngine_Sprite_get_packingRotation ();
+	void Register_UnityEngine_Sprite_Internal_GetTextureRectOffset ();
+	Register_UnityEngine_Sprite_Internal_GetTextureRectOffset ();
 	void Register_UnityEngine_SpriteRenderer_GetSprite_INTERNAL ();
 	Register_UnityEngine_SpriteRenderer_GetSprite_INTERNAL ();
 	void Register_UnityEngine_SpriteRenderer_SetSprite_INTERNAL ();

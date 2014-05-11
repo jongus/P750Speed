@@ -255,6 +255,12 @@ static void QueryDeviceGeneration()
 				if(rev >= 4)	_DeviceGeneration = deviceiPad4Gen; // iPad3,4
 				else			_DeviceGeneration = deviceiPad3Gen;
 			}
+			else if (!strncmp(model, "iPad4,", 6))
+			{
+				int rev = atoi(model+6);
+				if(rev >= 4)	_DeviceGeneration = deviceiPadMini2Gen; // iPad4,4
+				else			_DeviceGeneration = deviceiPad5Gen;
+			}
 		}
 
 		// completely unknown hw - just determine form-factor
@@ -266,8 +272,8 @@ static void QueryDeviceGeneration()
 				_DeviceGeneration = deviceiPadUnknown;
 			else if (!strncmp(model, "iPod",4))
 				_DeviceGeneration = deviceiPodTouchUnknown;
-
-			_DeviceGeneration = deviceUnknown;
+			else
+				_DeviceGeneration = deviceUnknown;
 		}
 	}
 }
@@ -282,7 +288,7 @@ static void EstimateDeviceDPI()
 		const char* model = UnityDeviceModel();
 		if(::strncmp(model, "iPad", 4) == 0)
 		{
-			if(UnityDeviceGeneration() == deviceiPadMini1Gen)	baseDPI = 167.0f;
+			if(UnityDeviceGeneration() == deviceiPadMini1Gen)	baseDPI = 163.0f;
 			else												baseDPI = 130.0f;
 		}
 

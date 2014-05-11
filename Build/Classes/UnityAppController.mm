@@ -203,6 +203,7 @@ void UnityInitTrampoline()
 
 - (void)repaint
 {
+	EAGLContextSetCurrentAutoRestore autorestore(_mainDisplay->surface.context);
 	SetupUnityDefaultFBO(&_mainDisplay->surface);
 
 	CheckOrientationRequest();

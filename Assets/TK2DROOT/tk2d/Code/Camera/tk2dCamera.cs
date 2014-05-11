@@ -507,6 +507,11 @@ public class tk2dCamera : MonoBehaviour
 			scale.Set(width / settings.nativeResolutionWidth, height / settings.nativeResolutionHeight);
 			break;
 
+		case tk2dCameraResolutionOverride.AutoScaleMode.Fill:
+			s = Mathf.Max(width / settings.nativeResolutionWidth,height / settings.nativeResolutionHeight);
+			scale.Set(s, s);
+			break;
+
 		default:
 		case tk2dCameraResolutionOverride.AutoScaleMode.None: 
 			s = currentOverride.scale;
@@ -575,6 +580,8 @@ public class tk2dCamera : MonoBehaviour
 		float right = pixelWidth + offset.x, top = pixelHeight + offset.y;
 		Vector2 nativeResolutionOffset = Vector2.zero;
 
+		bool usingLegacyViewportClipping = false;
+
 		// Correct for viewport clipping rendering
 		// Coordinates in subrect are "native" pixels, but origin is from the extrema of screen
 		if (this.viewportClippingEnabled && this.InheritConfig != null) {
@@ -583,6 +590,7 @@ public class tk2dCamera : MonoBehaviour
 			Vector4 sr = new Vector4((int)this.viewportRegion.x, (int)this.viewportRegion.y,
 									 (int)this.viewportRegion.z, (int)this.viewportRegion.w);
 
+			usingLegacyViewportClipping = true;
 	
 			float viewportLeft = -offset.x / pixelWidth + sr.x / vw;
 			float viewportBottom = -offset.y / pixelHeight + sr.y / vh;
@@ -658,6 +666,16 @@ public class tk2dCamera : MonoBehaviour
 			case tk2dCameraSettings.OrthographicType.PixelsPerMeter:
 				orthoSize = 1.0f / settings.cameraSettings.orthographicPixelsPerMeter;
 				break;
+		}
+
+		// Fixup for clipping
+		if (!usingLegacyViewportClipping) {
+			float clipWidth = Mathf.Min(UnityCamera.rect.width, 1.0f - UnityCamera.rect.x);
+			float clipHeight = Mathf.Min(UnityCamera.rect.height, 1.0f - UnityCamera.rect.y);
+			if (clipWidth > 0 && clipHeight > 0) {
+				scale.x /= clipWidth;
+				scale.y /= clipHeight;
+			}
 		}
 
 		float s = orthoSize * zoomScale;

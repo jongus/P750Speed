@@ -5,19 +5,19 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>F24EF2CB-72DB-431B-92C6-093B138F92E8</string>
+	<string>79377D76-3DC6-4DC6-87E7-16232979CF41</string>
 	<key>IDESourceControlProjectName</key>
 	<string>Unity-iPhone</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>5E3131BC-7E19-4A32-AF9B-DFCBDEE3EBC4</key>
+		<key>70C8A1B5-C1EE-4B2A-8F49-22E331A82547</key>
 		<string>https://github.com/jongus/P750Speed.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>Build/Unity-iPhone.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>5E3131BC-7E19-4A32-AF9B-DFCBDEE3EBC4</key>
+		<key>70C8A1B5-C1EE-4B2A-8F49-22E331A82547</key>
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
@@ -25,14 +25,14 @@
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>5E3131BC-7E19-4A32-AF9B-DFCBDEE3EBC4</string>
+	<string>70C8A1B5-C1EE-4B2A-8F49-22E331A82547</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>5E3131BC-7E19-4A32-AF9B-DFCBDEE3EBC4</string>
+			<string>70C8A1B5-C1EE-4B2A-8F49-22E331A82547</string>
 			<key>IDESourceControlWCCName</key>
 			<string>P750Speed</string>
 		</dict>

@@ -6,7 +6,7 @@ using System.IO;
 [InitializeOnLoad]
 public static class tk2dEditorUtility
 {
-	public static double version = 2.3;
+	public static double version = 2.4;
 	public static int releaseId = 0; // < -10001 = alpha 1, other negative = beta release, 0 = final, positive = final hotfix
 
 	static tk2dEditorUtility() {
@@ -394,6 +394,11 @@ public static class tk2dEditorUtility
 		return (PrefabUtility.GetPrefabType(obj) == PrefabType.Prefab);
 	}
 
+	public static bool IsEditable(UnityEngine.Object obj) {
+    	MonoBehaviour mb = obj as MonoBehaviour;
+    	return (mb && (mb.gameObject.hideFlags & HideFlags.NotEditable) == 0);
+	}
+
 	public static void SetGameObjectActive(GameObject go, bool active)
 	{
 #if UNITY_3_5
@@ -440,6 +445,9 @@ public static class tk2dEditorUtility
 	}
 
 	public static string SortingLayerNamePopup( string label, string value ) {
+		if (value == "") {
+			value = "Default";
+		}
 		string[] names = GetSortingLayerNames();
 		if (names.Length == 0) {
 			return EditorGUILayout.TextField(label, value);			
