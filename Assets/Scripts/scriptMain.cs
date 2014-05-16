@@ -177,15 +177,23 @@ public class ScriptMain : MonoBehaviour {
 			dCurMax = 0.0d;
 			dCurAvg = 0.0d;
 			iRunAvg = 0;
+			tmDebug.text = "RESET ALL";
+			tmDebug.Commit();
 		} else {
 			if(gesture.Position.x > ((Screen.width /3)*2)) {
 				dCurTrip = 0.0d;
+				tmDebug.text = "RESET TRIP";
+				tmDebug.Commit();
 			} else if(gesture.Position.x < (Screen.width /3)) {
 				dCurAvg = 0.0d;
 				iRunAvg = 0;
 				dCurAvgTrip = 0.0d;
+				tmDebug.text = "RESET AVG";
+				tmDebug.Commit();
 			} else {
 				dCurMax = 0.0d;	
+				tmDebug.text = "RESET MAX";
+				tmDebug.Commit();
 			}
 
 		}
@@ -356,10 +364,10 @@ public class ScriptMain : MonoBehaviour {
 				//AVG calculation here
 				double dAvgSpeed = adAvgSpeed[0] + adAvgSpeed[1] + adAvgSpeed[2];
 				dAvgSpeed /= 3.0d;
-				dCurSpeed = dAvgSpeed;
+				dCurSpeed = dSpeed; //dAvgSpeed;
 				fCurAccuracy = liTmp.horizontalAccuracy;
 				if(dAvgSpeed > dCurMax ) {
-					dCurMax = dAvgSpeed;
+					dCurMax = dSpeed; //dAvgSpeed;
 				}
 				if((iRunAvg == 0) && (dAvgSpeed > 10.0d)) {
 					iRunAvg = 1;
@@ -371,7 +379,7 @@ public class ScriptMain : MonoBehaviour {
 				if((iRunAvg == 1) && (dAvgSpeed > 20.0d)) {
 					iRunAvg = 2;
 				}
-				if((iRunAvg == 2) && (dAvgSpeed < 510.0d)) {
+				if((iRunAvg == 2) && (dAvgSpeed < 10.0d)) {
 					//Stop
 					dtStopAvg = DateTime.Now;
 					iRunAvg = 3;
